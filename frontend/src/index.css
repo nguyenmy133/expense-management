@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* User Theme (Default) - #0c3184 */
+    --primary-50: 240 244 253;
+    --primary-100: 224 233 251;
+    --primary-200: 193 212 247;
+    --primary-300: 162 191 244;
+    --primary-400: 100 148 237;
+    --primary-500: 37 106 230;
+    --primary-600: 12 49 132;
+    /* Main User Color */
+    --primary-700: 10 39 106;
+    --primary-800: 7 30 80;
+    --primary-900: 5 20 53;
+    --primary-DEFAULT: 12 49 132;
+  }
+
+  .theme-admin {
+    /* Admin Theme - #0c6d84 */
+    --primary-50: 240 249 251;
+    --primary-100: 224 243 246;
+    --primary-200: 193 231 237;
+    --primary-300: 162 219 227;
+    --primary-400: 100 196 210;
+    --primary-500: 37 172 192;
+    --primary-600: 12 109 132;
+    /* Main Admin Color */
+    --primary-700: 10 87 106;
+    --primary-800: 7 65 80;
+    --primary-900: 5 44 53;
+    --primary-DEFAULT: 12 109 132;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-200;
+  }
+
+  * {
+    @apply transition-colors duration-200;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+
+  /* Primary Button */
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-600 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer;
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-primary dark:text-primary-400 border-2 border-primary dark:border-primary-600 font-medium py-2.5 px-5 rounded-lg transition-all duration-200 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-800 cursor-pointer;
+  }
+
+  /* Glass Card */
+  .card {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-glass-dark p-6 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl dark:hover:shadow-glass-dark transition-all duration-200;
+  }
+
+  /* Glass Card - Solid variant */
+  .card-solid {
+    @apply bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-800 hover:shadow-xl transition-all duration-200;
+  }
+
+  /* Input Field */
+  .input-field {
+    @apply w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Gradient Primary */
+  .gradient-primary {
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-500 dark:to-primary-600;
+  }
+
+  /* Gradient Success */
+  .gradient-success {
+    @apply bg-gradient-to-br from-success-500 to-success-600 dark:from-success-600 dark:to-success-700;
+  }
+
+  /* Gradient Danger */
+  .gradient-danger {
+    @apply bg-gradient-to-br from-danger-500 to-danger-600 dark:from-danger-600 dark:to-danger-700;
+  }
+
+  /* Gradient Info */
+  .gradient-info {
+    @apply bg-gradient-to-br from-info-500 to-info-600 dark:from-info-600 dark:to-info-700;
+  }
+
+  /* Focus visible styles for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 dark:ring-offset-gray-900;
+  }
+
+  /* Modern Card */
+  .card-modern {
+    @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 transition-all duration-200;
+  }
+
+  /* Modern Input */
+  .input-modern {
+    @apply w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary/50 focus:border-primary placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200;
+  }
+}
+
+@layer utilities {
+
+  /* Glass effect utility */
+  .glass {
+    @apply bg-white/10 dark:bg-gray-900/10 backdrop-blur-md;
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800 dark:from-primary-400 dark:to-primary-600;
+  }
+}

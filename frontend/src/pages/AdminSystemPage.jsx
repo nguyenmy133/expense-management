@@ -44,9 +44,13 @@ export default function AdminSystemPage() {
 
     // Populate local state from context when settings change
     useEffect(() => {
-        if (settings.general) setGeneralSettings(settings.general);
-        if (settings.notification) setNotificationSettings(settings.notification);
-        if (settings.database) setDatabaseSettings(settings.database);
+        console.log("Settings from context updated:", settings);
+        if (settings.general) setGeneralSettings(prev => ({ ...prev, ...settings.general }));
+        if (settings.notification) {
+            console.log("Setting notification settings:", settings.notification);
+            setNotificationSettings(prev => ({ ...prev, ...settings.notification }));
+        }
+        if (settings.database) setDatabaseSettings(prev => ({ ...prev, ...settings.database }));
     }, [settings]);
 
     const handleSave = async () => {
@@ -58,6 +62,8 @@ export default function AdminSystemPage() {
                 notification: notificationSettings,
                 database: databaseSettings
             };
+
+            console.log("Saving settings payload:", settingsData);
 
             await updateSystemSettings(settingsData);
 
@@ -264,11 +270,6 @@ export default function AdminSystemPage() {
                                 )}
                             </div>
 
-                            <ToggleSwitch
-                                label="Thông báo khi có giao dịch mới"
-                                checked={notificationSettings.enableTransactionNotifications}
-                                onChange={(val) => setNotificationSettings({ ...notificationSettings, enableTransactionNotifications: val })}
-                            />
                         </div>
                     </div>
 

@@ -64,4 +64,35 @@ public class EmailService {
 
         sendEmail(to, subject, content);
     }
+
+    public void sendTransactionNotification(String to, String type, double amount, String category, String date,
+            String note) {
+        boolean isExpense = "EXPENSE".equalsIgnoreCase(type);
+        String subject = (isExpense ? "💸 Chi tiêu mới: " : "💰 Thu nhập mới: ") + String.format("%,.0f đ", amount);
+        String color = isExpense ? "#dc2626" : "#16a34a";
+        String typeText = isExpense ? "Chi tiêu" : "Thu nhập";
+
+        String content = String.format(
+                """
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+                            <h2 style="color: %s; text-align: center;">Giao dịch Mới</h2>
+                            <p>Xin chào,</p>
+                            <p>Hệ thống vừa ghi nhận một giao dịch <strong>%s</strong> mới:</p>
+
+                            <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid %s;">
+                                <p style="margin: 8px 0;">💵 Số tiền: <strong style="font-size: 1.2em; color: %s;">%,.0f đ</strong></p>
+                                <p style="margin: 8px 0;">📂 Danh mục: <strong>%s</strong></p>
+                                <p style="margin: 8px 0;">📅 Ngày: <strong>%s</strong></p>
+                                <p style="margin: 8px 0;">📝 Ghi chú: <em>%s</em></p>
+                            </div>
+
+                            <div style="text-align: center; margin-top: 30px;">
+                                <a href="http://localhost:5173" style="background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Xem Chi tiết</a>
+                            </div>
+                        </div>
+                        """,
+                color, typeText, color, color, amount, category, date, (note != null ? note : "Không có"));
+
+        sendEmail(to, subject, content);
+    }
 }

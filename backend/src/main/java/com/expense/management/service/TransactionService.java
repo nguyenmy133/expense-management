@@ -32,8 +32,8 @@ public class TransactionService {
     private final ProfileRepository profileRepository;
     private final CategoryRepository categoryRepository;
     private final com.expense.management.service.EmailService emailService;
-    private final com.expense.management.service.AdminService adminService;
     private final com.expense.management.repository.BudgetRepository budgetRepository;
+    private final com.expense.management.repository.SystemSettingRepository systemSettingRepository;
 
     @Transactional
     public TransactionResponse createTransaction(Long userId, TransactionRequest request) {
@@ -60,6 +60,9 @@ public class TransactionService {
         if (request.getType() == Transaction.TransactionType.EXPENSE) {
             checkBudgetAndNotify(user, category, request.getTransactionDate());
         }
+
+        // Send notification if enabled
+        checkTransactionNotification(user, saved);
 
         return mapToResponse(saved);
     }
@@ -93,61 +96,10 @@ public class TransactionService {
             checkBudgetAndNotify(transaction.getUser(), category, request.getTransactionDate());
         }
 
+        // Send notification if enabled
+        checkTransactionNotification(transaction.getUser(), updated);
+
         return mapToResponse(updated);
-    }
-
-    // ... (Existing deleteTransaction, getTransactions, etc. methods remain
-    // unchanged)
-
-    @Transactional(readOnly = true)
-    public void checkBudgetAndNotify(Profile user, Category category, LocalDate transactionDate) {
-        try {
-            // Get system settings
-            var settings = adminService.getSystemSettings();
-            if (!settings.getNotification().isEnableBudgetAlerts()) {
-                return;
-            }
-
-            int month = transactionDate.getMonthValue();
-            int year = transactionDate.getYear();
-
-            // Find budget for this category
-            var budgetOpt = budgetRepository.findByUserAndCategoryIdAndMonthAndYear(
-                    user, category.getId(), month, year);
-
-            if (budgetOpt.isEmpty()) {
-                return; // No budget set
-            }
-
-            var budget = budgetOpt.get();
-            BigDecimal limit = budget.getAmount();
-
-            // Calculate total expense for this category in the month
-            BigDecimal totalExpense = transactionRepository.sumByUserAndCategoryAndMonthAndYear(
-                    user, Transaction.TransactionType.EXPENSE, category.getId(), month, year);
-
-            if (totalExpense == null)
-                totalExpense = BigDecimal.ZERO;
-
-            double percentage = totalExpense.divide(limit, 4, java.math.RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100)).doubleValue();
-
-            int threshold = settings.getNotification().getBudgetAlertThreshold();
-
-            if (percentage >= threshold) {
-                // Send email
-                emailService.sendBudgetAlert(
-                        user.getEmail(),
-                        category.getName(),
-                        totalExpense.doubleValue(),
-                        limit.doubleValue(),
-                        percentage);
-            }
-
-        } catch (Exception e) {
-            log.error("Error verifying budget alert", e);
-            // Don't throw exception to avoid rollback of transaction
-        }
     }
 
     @Transactional
@@ -339,5 +291,84 @@ public class TransactionService {
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())
                 .build();
+    }
+
+    // Helper to get setting value directly from DB
+    private String getSettingValue(String key, String defaultValue) {
+        return systemSettingRepository.findByKey(key)
+                .map(com.expense.management.model.entity.SystemSetting::getValue)
+                .orElse(defaultValue);
+    }
+
+    @Transactional(readOnly = true)
+    public void checkBudgetAndNotify(Profile user, Category category, LocalDate transactionDate) {
+        try {
+            // Check if budget alerts are enabled directly from DB
+            boolean enableBudgetAlerts = Boolean
+                    .parseBoolean(getSettingValue("notification.enableBudgetAlerts", "true"));
+
+            if (!enableBudgetAlerts) {
+                return;
+            }
+
+            int month = transactionDate.getMonthValue();
+            int year = transactionDate.getYear();
+
+            // Find budget for this category
+            var budgetOpt = budgetRepository.findByUserAndCategoryIdAndMonthAndYear(
+                    user, category.getId(), month, year);
+
+            if (budgetOpt.isEmpty()) {
+                return; // No budget set
+            }
+
+            var budget = budgetOpt.get();
+            BigDecimal limit = budget.getAmount();
+
+            // Calculate total expense for this category in the month
+            BigDecimal totalExpense = transactionRepository.sumByUserAndCategoryAndMonthAndYear(
+                    user, Transaction.TransactionType.EXPENSE, category.getId(), month, year);
+
+            if (totalExpense == null)
+                totalExpense = BigDecimal.ZERO;
+
+            double percentage = totalExpense.divide(limit, 4, java.math.RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100)).doubleValue();
+
+            int threshold = Integer.parseInt(getSettingValue("notification.budgetAlertThreshold", "80"));
+
+            if (percentage >= threshold) {
+                // Send email
+                emailService.sendBudgetAlert(
+                        user.getEmail(),
+                        category.getName(),
+                        totalExpense.doubleValue(),
+                        limit.doubleValue(),
+                        percentage);
+            }
+
+        } catch (Exception e) {
+            log.error("Error verifying budget alert", e);
+        }
+    }
+
+    public void checkTransactionNotification(Profile user, Transaction transaction) {
+        try {
+            // Check if transaction notifications are enabled directly from DB
+            boolean enableTransactionNotifications = Boolean
+                    .parseBoolean(getSettingValue("notification.enableTransactionNotifications", "false"));
+
+            if (enableTransactionNotifications) {
+                emailService.sendTransactionNotification(
+                        user.getEmail(),
+                        transaction.getType().name(),
+                        transaction.getAmount().doubleValue(),
+                        transaction.getCategory().getName(),
+                        transaction.getTransactionDate().toString(),
+                        transaction.getNote());
+            }
+        } catch (Exception e) {
+            log.error("Error sending transaction notification", e);
+        }
     }
 }

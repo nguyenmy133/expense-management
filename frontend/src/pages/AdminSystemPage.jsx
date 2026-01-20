@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Settings,
     Database,
@@ -13,8 +13,10 @@ import {
     Key,
     RefreshCw
 } from 'lucide-react';
+import { useSystemSettings } from '../contexts/SystemSettingsContext';
 
 export default function AdminSystemPage() {
+    const { settings, updateSystemSettings, loading: contextLoading } = useSystemSettings();
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
 
@@ -33,13 +35,6 @@ export default function AdminSystemPage() {
         enableTransactionNotifications: false
     });
 
-    const [securitySettings, setSecuritySettings] = useState({
-        enableTwoFactor: false,
-        sessionTimeout: 30,
-        maxLoginAttempts: 5,
-        passwordMinLength: 8,
-        requireSpecialChar: true
-    });
 
     const [databaseSettings, setDatabaseSettings] = useState({
         autoBackup: true,
@@ -47,24 +42,31 @@ export default function AdminSystemPage() {
         retentionDays: 30
     });
 
+    // Populate local state from context when settings change
+    useEffect(() => {
+        if (settings.general) setGeneralSettings(settings.general);
+        if (settings.notification) setNotificationSettings(settings.notification);
+        if (settings.database) setDatabaseSettings(settings.database);
+    }, [settings]);
+
     const handleSave = async () => {
         try {
             setSaving(true);
-            // TODO: Implement actual API call to save settings
-            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            console.log('Saving settings:', {
+            const settingsData = {
                 general: generalSettings,
                 notification: notificationSettings,
-                security: securitySettings,
                 database: databaseSettings
-            });
+            };
+
+            await updateSystemSettings(settingsData);
 
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
         } catch (error) {
             console.error('Error saving settings:', error);
-            alert('Lỗi khi lưu cài đặt: ' + error.message);
+            const message = error.response?.data?.message || error.message;
+            alert('Lỗi khi lưu cài đặt: ' + message);
         } finally {
             setSaving(false);
         }
@@ -270,77 +272,6 @@ export default function AdminSystemPage() {
                         </div>
                     </div>
 
-                    {/* Security Settings */}
-                    <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/20 overflow-hidden border border-gray-100 dark:border-gray-800 transition-all hover:border-primary/20 dark:hover:border-primary/20">
-                        <SectionHeader
-                            icon={Shield}
-                            title="Bảo mật & An toàn"
-                            description="Các quy tắc đăng nhập và mật khẩu"
-                            gradient="bg-gradient-to-br from-red-500 to-rose-600"
-                        />
-                        <div className="p-6 space-y-5">
-                            <ToggleSwitch
-                                label="Xác thực 2 bước (2FA)"
-                                checked={securitySettings.enableTwoFactor}
-                                onChange={(val) => setSecuritySettings({ ...securitySettings, enableTwoFactor: val })}
-                            />
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-                                        Timeout (phút)
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            type="number"
-                                            className="w-full pl-4 pr-8 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/50 font-bold text-gray-900 dark:text-white"
-                                            value={securitySettings.sessionTimeout}
-                                            onChange={(e) => setSecuritySettings({ ...securitySettings, sessionTimeout: parseInt(e.target.value) })}
-                                        />
-                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">m</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-                                        Max Login Retry
-                                    </label>
-                                    <input
-                                        type="number"
-                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/50 font-bold text-gray-900 dark:text-white"
-                                        value={securitySettings.maxLoginAttempts}
-                                        onChange={(e) => setSecuritySettings({ ...securitySettings, maxLoginAttempts: parseInt(e.target.value) })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
-                                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Chính sách mật khẩu</h4>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <label className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 cursor-pointer">
-                                        <span className="text-sm text-gray-600 dark:text-gray-300">Ký tự đặc biệt</span>
-                                        <div className="relative inline-flex items-center cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={securitySettings.requireSpecialChar}
-                                                onChange={(e) => setSecuritySettings({ ...securitySettings, requireSpecialChar: e.target.checked })}
-                                                className="sr-only peer"
-                                            />
-                                            <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-                                        </div>
-                                    </label>
-                                    <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                                        <span className="text-sm text-gray-600 dark:text-gray-300 flex-1">Độ dài tối thiểu</span>
-                                        <input
-                                            type="number"
-                                            value={securitySettings.passwordMinLength}
-                                            onChange={(e) => setSecuritySettings({ ...securitySettings, passwordMinLength: parseInt(e.target.value) })}
-                                            className="w-16 py-1 px-2 text-center rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 font-bold text-sm"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     {/* Database Settings */}
                     <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/20 overflow-hidden border border-gray-100 dark:border-gray-800 transition-all hover:border-primary/20 dark:hover:border-primary/20">

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SystemSettingsProvider } from './contexts/SystemSettingsContext';
 import { Loader2 } from 'lucide-react';
 import AppLayout from './components/layout/AppLayout';
 import LoginPage from './pages/LoginPage';
@@ -62,52 +63,54 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <PublicRoute>
-                <RegisterPage />
-              </PublicRoute>
-            }
-          />
+        <SystemSettingsProvider>
+          <Routes>
+            {/* Public Routes */}
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <LoginPage />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <PublicRoute>
+                  <RegisterPage />
+                </PublicRoute>
+              }
+            />
 
-          {/* Protected Routes with Layout */}
-          <Route
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/transactions" element={<TransactionsPage />} />
-            <Route path="/budgets" element={<BudgetsPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/chat" element={<ChatPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            {/* Protected Routes with Layout */}
+            <Route
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/transactions" element={<TransactionsPage />} />
+              <Route path="/budgets" element={<BudgetsPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
 
-            {/* Admin Routes */}
-            <Route path="/admin/categories" element={<AdminCategoriesPage />} />
-            <Route path="/admin/users" element={<AdminUsersPage />} />
-            <Route path="/admin/system" element={<AdminSystemPage />} />
-          </Route>
+              {/* Admin Routes */}
+              <Route path="/admin/categories" element={<AdminCategoriesPage />} />
+              <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/system" element={<AdminSystemPage />} />
+            </Route>
 
-          {/* Default Route */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* Default Route */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-          {/* 404 Route */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
+            {/* 404 Route */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </SystemSettingsProvider>
       </AuthProvider>
     </BrowserRouter>
   );

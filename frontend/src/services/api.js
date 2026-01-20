@@ -95,6 +95,10 @@ export const adminAPI = {
     update: (id, data) => api.put(`/admin/users/${id}`, data),
     updateUserRole: (id, role) => api.put(`/admin/users/${id}/role`, null, { params: { role } }),
     deleteUser: (id) => api.delete(`/admin/users/${id}`),
+
+    // System Settings
+    getSettings: () => api.get('/admin/settings'),
+    updateSettings: (data) => api.post('/admin/settings', data),
 };
 
 export default api;

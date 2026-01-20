@@ -58,4 +58,18 @@ public class AdminController {
         UserResponse user = adminService.updateUser(id, request);
         return ResponseEntity.ok(ApiResponse.success(user));
     }
+
+    @GetMapping("/settings")
+    public ResponseEntity<ApiResponse<com.expense.management.model.dto.SystemSettingsDto>> getSystemSettings() {
+        com.expense.management.model.dto.SystemSettingsDto settings = adminService.getSystemSettings();
+        return ResponseEntity.ok(ApiResponse.success(settings));
+    }
+
+    @PostMapping("/settings")
+    public ResponseEntity<ApiResponse<com.expense.management.model.dto.SystemSettingsDto>> updateSystemSettings(
+            @RequestBody com.expense.management.model.dto.SystemSettingsDto settings) {
+        com.expense.management.model.dto.SystemSettingsDto updatedSettings = adminService
+                .updateSystemSettings(settings);
+        return ResponseEntity.ok(ApiResponse.success(updatedSettings));
+    }
 }

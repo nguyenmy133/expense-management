@@ -31,6 +31,9 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final ProfileRepository profileRepository;
     private final CategoryRepository categoryRepository;
+    private final com.expense.management.service.EmailService emailService;
+    private final com.expense.management.service.AdminService adminService;
+    private final com.expense.management.repository.BudgetRepository budgetRepository;
 
     @Transactional
     public TransactionResponse createTransaction(Long userId, TransactionRequest request) {
@@ -52,6 +55,12 @@ public class TransactionService {
                 .build();
 
         Transaction saved = transactionRepository.save(transaction);
+
+        // Check budget and notify
+        if (request.getType() == Transaction.TransactionType.EXPENSE) {
+            checkBudgetAndNotify(user, category, request.getTransactionDate());
+        }
+
         return mapToResponse(saved);
     }
 
@@ -78,7 +87,67 @@ public class TransactionService {
         transaction.setNote(request.getNote());
 
         Transaction updated = transactionRepository.save(transaction);
+
+        // Check budget and notify
+        if (request.getType() == Transaction.TransactionType.EXPENSE) {
+            checkBudgetAndNotify(transaction.getUser(), category, request.getTransactionDate());
+        }
+
         return mapToResponse(updated);
+    }
+
+    // ... (Existing deleteTransaction, getTransactions, etc. methods remain
+    // unchanged)
+
+    @Transactional(readOnly = true)
+    public void checkBudgetAndNotify(Profile user, Category category, LocalDate transactionDate) {
+        try {
+            // Get system settings
+            var settings = adminService.getSystemSettings();
+            if (!settings.getNotification().isEnableBudgetAlerts()) {
+                return;
+            }
+
+            int month = transactionDate.getMonthValue();
+            int year = transactionDate.getYear();
+
+            // Find budget for this category
+            var budgetOpt = budgetRepository.findByUserAndCategoryIdAndMonthAndYear(
+                    user, category.getId(), month, year);
+
+            if (budgetOpt.isEmpty()) {
+                return; // No budget set
+            }
+
+            var budget = budgetOpt.get();
+            BigDecimal limit = budget.getAmount();
+
+            // Calculate total expense for this category in the month
+            BigDecimal totalExpense = transactionRepository.sumByUserAndCategoryAndMonthAndYear(
+                    user, Transaction.TransactionType.EXPENSE, category.getId(), month, year);
+
+            if (totalExpense == null)
+                totalExpense = BigDecimal.ZERO;
+
+            double percentage = totalExpense.divide(limit, 4, java.math.RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100)).doubleValue();
+
+            int threshold = settings.getNotification().getBudgetAlertThreshold();
+
+            if (percentage >= threshold) {
+                // Send email
+                emailService.sendBudgetAlert(
+                        user.getEmail(),
+                        category.getName(),
+                        totalExpense.doubleValue(),
+                        limit.doubleValue(),
+                        percentage);
+            }
+
+        } catch (Exception e) {
+            log.error("Error verifying budget alert", e);
+            // Don't throw exception to avoid rollback of transaction
+        }
     }
 
     @Transactional

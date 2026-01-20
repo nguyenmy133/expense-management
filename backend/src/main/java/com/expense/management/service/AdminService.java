@@ -110,6 +110,77 @@ public class AdminService {
         }
     }
 
+    private final com.expense.management.repository.SystemSettingRepository systemSettingRepository;
+
+    @Transactional(readOnly = true)
+    public com.expense.management.model.dto.SystemSettingsDto getSystemSettings() {
+        return com.expense.management.model.dto.SystemSettingsDto.builder()
+                .general(com.expense.management.model.dto.SystemSettingsDto.GeneralSettings.builder()
+                        .siteName(getSettingValue("general.siteName", "Expense Management"))
+                        .siteDescription(getSettingValue("general.siteDescription", "Quản lý chi tiêu cá nhân"))
+                        .timezone(getSettingValue("general.timezone", "Asia/Ho_Chi_Minh"))
+                        .language(getSettingValue("general.language", "vi"))
+                        .currency(getSettingValue("general.currency", "VND"))
+                        .build())
+                .notification(com.expense.management.model.dto.SystemSettingsDto.NotificationSettings.builder()
+                        .enableEmailNotifications(
+                                Boolean.parseBoolean(getSettingValue("notification.enableEmailNotifications", "true")))
+                        .enableBudgetAlerts(
+                                Boolean.parseBoolean(getSettingValue("notification.enableBudgetAlerts", "true")))
+                        .budgetAlertThreshold(
+                                Integer.parseInt(getSettingValue("notification.budgetAlertThreshold", "80")))
+                        .enableTransactionNotifications(Boolean
+                                .parseBoolean(getSettingValue("notification.enableTransactionNotifications", "false")))
+                        .build())
+                .database(com.expense.management.model.dto.SystemSettingsDto.DatabaseSettings.builder()
+                        .autoBackup(Boolean.parseBoolean(getSettingValue("database.autoBackup", "true")))
+                        .backupFrequency(getSettingValue("database.backupFrequency", "daily"))
+                        .retentionDays(Integer.parseInt(getSettingValue("database.retentionDays", "30")))
+                        .build())
+                .build();
+    }
+
+    @Transactional
+    public com.expense.management.model.dto.SystemSettingsDto updateSystemSettings(
+            com.expense.management.model.dto.SystemSettingsDto settings) {
+        // General
+        saveSetting("general.siteName", settings.getGeneral().getSiteName());
+        saveSetting("general.siteDescription", settings.getGeneral().getSiteDescription());
+        saveSetting("general.timezone", settings.getGeneral().getTimezone());
+        saveSetting("general.language", settings.getGeneral().getLanguage());
+        saveSetting("general.currency", settings.getGeneral().getCurrency());
+
+        // Notification
+        saveSetting("notification.enableEmailNotifications",
+                String.valueOf(settings.getNotification().isEnableEmailNotifications()));
+        saveSetting("notification.enableBudgetAlerts",
+                String.valueOf(settings.getNotification().isEnableBudgetAlerts()));
+        saveSetting("notification.budgetAlertThreshold",
+                String.valueOf(settings.getNotification().getBudgetAlertThreshold()));
+        saveSetting("notification.enableTransactionNotifications",
+                String.valueOf(settings.getNotification().isEnableTransactionNotifications()));
+
+        // Database
+        saveSetting("database.autoBackup", String.valueOf(settings.getDatabase().isAutoBackup()));
+        saveSetting("database.backupFrequency", settings.getDatabase().getBackupFrequency());
+        saveSetting("database.retentionDays", String.valueOf(settings.getDatabase().getRetentionDays()));
+
+        return settings;
+    }
+
+    private String getSettingValue(String key, String defaultValue) {
+        return systemSettingRepository.findByKey(key)
+                .map(com.expense.management.model.entity.SystemSetting::getValue)
+                .orElse(defaultValue);
+    }
+
+    private void saveSetting(String key, String value) {
+        com.expense.management.model.entity.SystemSetting setting = systemSettingRepository.findByKey(key)
+                .orElse(com.expense.management.model.entity.SystemSetting.builder().key(key).build());
+        setting.setValue(value);
+        systemSettingRepository.save(setting);
+    }
+
     @Transactional
     public void deleteUser(Long id) {
         if (!profileRepository.existsById(id)) {

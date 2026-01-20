@@ -17,10 +17,12 @@ import {
     Tag
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import DarkModeToggle from './DarkModeToggle';
 
 export default function Sidebar({ isOpen, onClose }) {
     const { user } = useAuth();
+    const { settings } = useSystemSettings();
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const navItems = [
@@ -103,7 +105,7 @@ export default function Sidebar({ isOpen, onClose }) {
                             <img src="/logo.png" alt="Monex Logo" className="w-10 h-10 object-contain" />
                             <div>
                                 <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
-                                    Monex
+                                    {settings?.siteName || 'Monex'}
                                 </h1>
                             </div>
                         </div>

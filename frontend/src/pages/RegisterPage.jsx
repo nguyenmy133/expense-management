@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Wallet, User, Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function RegisterPage() {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
@@ -22,7 +24,7 @@ export default function RegisterPage() {
             await signUp(email, password, fullName);
             navigate('/dashboard');
         } catch (err) {
-            setError(err.message || 'Đăng ký thất bại');
+            setError(err.message || t('common.error'));
         } finally {
             setLoading(false);
         }
@@ -37,9 +39,9 @@ export default function RegisterPage() {
                         <Wallet className="w-9 h-9 text-white" />
                     </div>
                     <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                        Tạo tài khoản
+                        {t('auth.register.title')}
                     </h1>
-                    <p className="text-gray-600 dark:text-gray-400">Bắt đầu quản lý chi tiêu của bạn</p>
+                    <p className="text-gray-600 dark:text-gray-400">{t('auth.register.subtitle')}</p>
                 </div>
 
                 {/* Register Form */}
@@ -49,7 +51,7 @@ export default function RegisterPage() {
                             <div className="flex items-start gap-3">
                                 <AlertCircle className="w-5 h-5 text-danger-600 dark:text-danger-400 flex-shrink-0 mt-0.5" />
                                 <div>
-                                    <p className="font-medium text-danger-800 dark:text-danger-300">Lỗi</p>
+                                    <p className="font-medium text-danger-800 dark:text-danger-300">{t('auth.login.error_title')}</p>
                                     <p className="text-sm text-danger-700 dark:text-danger-400">{error}</p>
                                 </div>
                             </div>
@@ -59,7 +61,7 @@ export default function RegisterPage() {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Họ và tên
+                                {t('auth.register.fullname')}
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -70,7 +72,7 @@ export default function RegisterPage() {
                                     value={fullName}
                                     onChange={(e) => setFullName(e.target.value)}
                                     className="input-field pl-10"
-                                    placeholder="Nguyễn Văn A"
+                                    placeholder={t('auth.register.fullname_placeholder')}
                                     required
                                 />
                             </div>
@@ -78,7 +80,7 @@ export default function RegisterPage() {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Email
+                                {t('auth.register.email')}
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -89,7 +91,7 @@ export default function RegisterPage() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="input-field pl-10"
-                                    placeholder="your@email.com"
+                                    placeholder={t('auth.register.email_placeholder')}
                                     required
                                 />
                             </div>
@@ -97,7 +99,7 @@ export default function RegisterPage() {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Mật khẩu
+                                {t('auth.register.password')}
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -113,7 +115,7 @@ export default function RegisterPage() {
                                     minLength={6}
                                 />
                             </div>
-                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Tối thiểu 6 ký tự</p>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t('auth.register.min_length')}</p>
                         </div>
 
                         <button
@@ -124,30 +126,32 @@ export default function RegisterPage() {
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">
                                     <Loader2 className="w-5 h-5 animate-spin" />
-                                    Đang đăng ký...
+                                    {t('auth.register.loading')}
                                 </span>
                             ) : (
-                                'Đăng ký'
+                                t('auth.register.submit')
                             )}
                         </button>
                     </form>
 
                     <div className="mt-6 text-center">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Đã có tài khoản?{' '}
-                            <Link
-                                to="/login"
-                                className="text-primary hover:text-primary-700 dark:hover:text-primary-400 font-medium hover:underline transition-colors"
-                            >
-                                Đăng nhập ngay
-                            </Link>
-                        </p>
+                        <div className="mt-6 text-center">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {t('auth.register.have_account')}{' '}
+                                <Link
+                                    to="/login"
+                                    className="text-primary hover:text-primary-700 dark:hover:text-primary-400 font-medium hover:underline transition-colors"
+                                >
+                                    {t('auth.register.login_now')}
+                                </Link>
+                            </p>
+                        </div>
                     </div>
                 </div>
 
                 {/* Footer */}
                 <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
-                    © 2024 Expense Management. All rights reserved.
+                    {t('auth.footer')}
                 </p>
             </div>
         </div>

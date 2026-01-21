@@ -1,0 +1,344 @@
+{
+    "sidebar": {
+        "dashboard": "Tổng quan",
+        "dashboard_desc": "Tổng quan",
+        "transactions": "Giao dịch",
+        "transactions_desc": "Quản lý thu chi",
+        "budgets": "Ngân sách",
+        "budgets_desc": "Lập kế hoạch",
+        "reports": "Báo cáo",
+        "reports_desc": "Thống kê",
+        "ai_assistant": "Trợ lý AI",
+        "ai_assistant_desc": "Tư vấn tài chính",
+        "personal": "Cá nhân",
+        "admin": {
+            "title": "Quản trị",
+            "categories": "Danh mục",
+            "categories_desc": "Quản lý danh mục",
+            "users": "Quản lý Người dùng",
+            "users_desc": "Quản lý user",
+            "settings": "Cài đặt Hệ thống",
+            "settings_desc": "Cài đặt"
+        }
+    },
+    "common": {
+        "currency_symbol": "₫",
+        "profile": "Hồ sơ cá nhân",
+        "logout": "Đăng xuất",
+        "language": "Ngôn ngữ",
+        "save": "Lưu thay đổi",
+        "cancel": "Hủy bỏ",
+        "success": "Thành công",
+        "error": "Lỗi",
+        "delete": "Xóa",
+        "edit": "Chỉnh sửa",
+        "confirm_delete": "Bạn có chắc muốn xóa mục này?",
+        "loading": "Đang tải dữ liệu...",
+        "no_data": "Không tìm thấy dữ liệu",
+        "add": "Thêm mới"
+    },
+    "transactions": {
+        "title": "Giao dịch",
+        "subtitle": "Quản lý thu chi của bạn",
+        "add_button": "Thêm giao dịch",
+        "search_placeholder": "Tìm kiếm ghi chú...",
+        "filters": {
+            "all_categories": "Tất cả danh mục",
+            "all_time": "Tất cả thời gian",
+            "today": "Hôm nay",
+            "this_week": "Tuần này",
+            "this_month": "Tháng này",
+            "last_month": "Tháng trước",
+            "custom": "Tùy chọn...",
+            "from_date": "Từ ngày",
+            "to_date": "Đến ngày"
+        },
+        "empty": {
+            "title": "Không tìm thấy giao dịch nào",
+            "subtitle": "Thử thay đổi bộ lọc hoặc thêm giao dịch mới"
+        },
+        "modal": {
+            "create_title": "Thêm giao dịch",
+            "edit_title": "Chỉnh sửa giao dịch",
+            "view_title": "Chi tiết giao dịch",
+            "type": "Loại",
+            "expense": "Chi tiêu",
+            "income": "Thu nhập",
+            "category": "Danh mục",
+            "select_category": "Chọn danh mục",
+            "amount": "Số tiền",
+            "date": "Ngày",
+            "note": "Ghi chú",
+            "note_placeholder": "Nhập ghi chú cho giao dịch..."
+        },
+        "messages": {
+            "add_success": "Thêm giao dịch thành công!",
+            "update_success": "Cập nhật giao dịch thành công!",
+            "delete_success": "Xóa giao dịch thành công!",
+            "save_error": "Lưu giao dịch thất bại!",
+            "delete_error": "Xóa thất bại!"
+        }
+    },
+    "budgets": {
+        "title": "Ngân sách",
+        "subtitle": "Lập kế hoạch và kiểm soát chi tiêu",
+        "add_button": "Thêm ngân sách",
+        "empty": {
+            "title": "Chưa có ngân sách nào",
+            "subtitle": "Lập kế hoạch chi tiêu để quản lý tài chính tốt hơn!",
+            "create_first": "Tạo ngân sách đầu tiên"
+        },
+        "card": {
+            "spent": "Đã dùng",
+            "remaining": "Còn lại",
+            "over_budget": "Vượt ngân sách",
+            "over_amount": "Bạn đã chi vượt {{amount}}",
+            "adjust": "Điều chỉnh ngân sách",
+            "view_tx": "Xem giao dịch"
+        },
+        "modal": {
+            "create_title": "Thêm ngân sách",
+            "edit_title": "Điều chỉnh ngân sách",
+            "month": "Tháng",
+            "year": "Năm"
+        }
+    },
+    "reports": {
+        "title": "Báo cáo tài chính",
+        "subtitle": "Tổng quan tình hình thu chi của bạn",
+        "summary": {
+            "total_income": "Tổng thu nhập",
+            "total_expense": "Tổng chi tiêu",
+            "balance": "Số dư"
+        },
+        "charts": {
+            "distribution": "Phân bổ chi tiêu",
+            "no_data": "Chưa có dữ liệu chi tiêu",
+            "trend": "Xu hướng chi tiêu trong tháng",
+            "day": "Ngày",
+            "expense": "Chi tiêu"
+        },
+        "list": {
+            "title": "Chi tiết theo danh mục",
+            "empty": "Chưa có dữ liệu chi tiêu trong tháng này"
+        },
+        "analysis": {
+            "title": "Phân tích",
+            "good": "Bạn đang quản lý tài chính tốt! Thu nhập lớn hơn chi tiêu.",
+            "keep_up": "Hãy tiếp tục duy trì thói quen tốt này.",
+            "bad": "Chi tiêu của bạn đang vượt quá thu nhập.",
+            "cut_down": "Hãy xem xét cắt giảm các khoản chi không cần thiết.",
+            "top_category": "Danh mục chi tiêu nhiều nhất"
+        }
+    },
+    "chat": {
+        "title": "Trợ lý AI",
+        "subtitle": "Trợ lý tài chính thông minh",
+        "welcome": "Xin chào! 👋",
+        "welcome_message": "Tôi là trợ lý tài chính AI. Hãy hỏi tôi bất cứ điều gì!",
+        "input_placeholder": "Nhập câu hỏi của bạn...",
+        "clear_history": "Xóa lịch sử",
+        "confirm_clear": "Bạn có chắc muốn xóa toàn bộ lịch sử chat?",
+        "error_message": "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.",
+        "questions": {
+            "save_money": "Làm sao để tiết kiệm hiệu quả?",
+            "budget_allocation": "Tôi nên phân bổ ngân sách như thế nào?",
+            "daily_expense": "Cách quản lý chi tiêu hàng ngày?",
+            "investment_advice": "Lời khuyên về đầu tư cho người mới"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "Đăng nhập",
+            "subtitle": "Đăng nhập để tiêu tục",
+            "submit": "Đăng nhập",
+            "loading": "Đang đăng nhập...",
+            "no_account": "Chưa có tài khoản?",
+            "register_now": "Đăng ký ngay",
+            "error_title": "Lỗi",
+            "success": "Đăng nhập thành công"
+        },
+        "register": {
+            "title": "Tạo tài khoản",
+            "subtitle": "Bắt đầu quản lý chi tiêu của bạn",
+            "submit": "Đăng ký",
+            "loading": "Đang đăng ký...",
+            "have_account": "Đã có tài khoản?",
+            "login_now": "Đăng nhập ngay",
+            "fullname": "Họ và tên",
+            "fullname_placeholder": "Nguyễn Văn A",
+            "email": "Email",
+            "email_placeholder": "your@email.com",
+            "password": "Mật khẩu",
+            "password_placeholder": "••••••••",
+            "min_length": "Tối thiểu 6 ký tự",
+            "success": "Đăng ký thành công"
+        },
+        "footer": "© 2024 Expense Management. All rights reserved."
+    },
+    "dashboard": {
+        "title": "Xin chào, {{name}}!",
+        "subtitle": "Tổng quan chi tiêu của bạn trong tháng {{month}}",
+        "time_range": {
+            "today": "Hôm nay",
+            "week": "Tuần này",
+            "month": "Tháng này"
+        },
+        "stats": {
+            "income": "Thu nhập",
+            "expense": "Chi tiêu",
+            "balance": "Số dư"
+        },
+        "loading": "Đang tải dữ liệu...",
+        "tip": {
+            "title": "Mẹo quản lý chi tiêu",
+            "content": "Hãy ghi chép mọi khoản chi tiêu hàng ngày để kiểm soát tài chính tốt hơn!"
+        }
+    },
+    "admin": {
+        "categories": {
+            "title": "Quản lý Danh mục",
+            "subtitle": "Quản lý các danh mục thu chi trong hệ thống",
+            "search_placeholder": "Tìm kiếm danh mục...",
+            "add_button": "Thêm danh mục",
+            "total": "Tổng danh mục",
+            "income": "Thu nhập",
+            "expense": "Chi tiêu",
+            "empty": "Không tìm thấy danh mục nào",
+            "table": {
+                "icon": "Icon",
+                "name": "Tên danh mục",
+                "type": "Loại",
+                "actions": "Thao tác"
+            },
+            "modal": {
+                "create_title": "Thêm danh mục mới",
+                "edit_title": "Chỉnh sửa danh mục",
+                "name": "Tên danh mục",
+                "name_placeholder": "Nhập tên danh mục...",
+                "type": "Loại",
+                "icon": "Icon"
+            },
+            "messages": {
+                "save_success": "Lưu danh mục thành công!",
+                "delete_success": "Xóa danh mục thành công!",
+                "error_save": "Lỗi khi lưu danh mục",
+                "error_delete": "Lỗi khi xóa danh mục",
+                "confirm_delete": "Bạn có chắc chắn muốn xóa danh mục này?"
+            }
+        },
+        "users": {
+            "title": "Quản lý Người dùng",
+            "subtitle": "Quản lý tài khoản người dùng trong hệ thống",
+            "search_placeholder": "Tìm kiếm người dùng...",
+            "add_button": "Thêm người dùng",
+            "total": "Tổng người dùng",
+            "admins": "Quản trị viên",
+            "regular_users": "Người dùng thường",
+            "empty": "Không tìm thấy người dùng nào",
+            "table": {
+                "name": "Họ và tên",
+                "email": "Email",
+                "role": "Vai trò",
+                "created_at": "Ngày tạo",
+                "actions": "Thao tác"
+            },
+            "modal": {
+                "create_title": "Thêm người dùng mới",
+                "edit_title": "Chỉnh sửa người dùng",
+                "name": "Họ và tên",
+                "name_placeholder": "Nhập họ và tên...",
+                "email": "Email",
+                "email_placeholder": "Nhập email...",
+                "password": "Mật khẩu",
+                "password_hint": "(để trống nếu không đổi)",
+                "password_placeholder": "Nhập mật khẩu...",
+                "role": "Vai trò",
+                "role_user": "Người dùng",
+                "role_admin": "Quản trị viên"
+            },
+            "messages": {
+                "required_fields": "Vui lòng điền đầy đủ thông tin bắt buộc",
+                "password_required": "Vui lòng nhập mật khẩu cho người dùng mới",
+                "save_success": "Lưu người dùng thành công!",
+                "delete_success": "Xóa người dùng thành công!",
+                "error_save": "Lỗi khi lưu người dùng",
+                "error_delete": "Lỗi khi xóa người dùng",
+                "confirm_delete": "Bạn có chắc chắn muốn xóa người dùng này?"
+            }
+        },
+        "system": {
+            "title": "Cài đặt Hệ thống",
+            "subtitle": "Quản lý toàn bộ cấu hình và tham số vận hành của hệ thống",
+            "save_button": "Lưu thay đổi",
+            "saving": "Đang lưu...",
+            "saved_success": "Đã lưu thành công!",
+            "general": {
+                "title": "Tổng quan",
+                "description": "Thông tin cơ bản và bản địa hóa",
+                "site_name": "Tên ứng dụng",
+                "site_description": "Mô tả ngắn",
+                "language": "Ngôn ngữ",
+                "currency": "Tiền tệ"
+            },
+            "notifications": {
+                "title": "Thông báo",
+                "description": "Tùy chỉnh các kênh liên lạc và cảnh báo",
+                "email_notifications": "Gửi thông báo qua Email",
+                "budget_alerts": "Cảnh báo vượt ngân sách",
+                "threshold": "Ngưỡng cảnh báo (%)"
+            },
+            "messages": {
+                "error_save": "Lỗi khi lưu cài đặt"
+            }
+        }
+    },
+    "profile": {
+        "title": "Hồ sơ người dùng",
+        "role_admin": "Quản trị viên",
+        "role_user": "Người dùng",
+        "joined": "Tham gia từ",
+        "save_changes": "Lưu thay đổi",
+        "saving": "Đang lưu...",
+        "save_success": "Đã cập nhật thông tin thành công!",
+        "error_save": "Có lỗi xảy ra khi lưu.",
+        "tabs": {
+            "general": "Thông tin chung",
+            "security": "Bảo mật",
+            "settings": "Cài đặt"
+        },
+        "general": {
+            "title": "Thông tin cá nhân",
+            "subtitle": "Cập nhật thông tin công khai của bạn.",
+            "fullname": "Họ và tên",
+            "phone": "Số điện thoại",
+            "email": "Email",
+            "bio": "Giới thiệu",
+            "bio_limit": "Tối đa 500 ký tự"
+        },
+        "security": {
+            "title": "Đổi mật khẩu",
+            "subtitle": "Đảm bảo sử dụng mật khẩu mạnh để bảo vệ tài khoản.",
+            "current_password": "Mật khẩu hiện tại",
+            "new_password": "Mật khẩu mới",
+            "confirm_password": "Xác nhận mật khẩu",
+            "update_password": "Cập nhật mật khẩu",
+            "processing": "Đang xử lý...",
+            "password_mismatch": "Mật khẩu mới và xác nhận mật khẩu không khớp",
+            "password_success": "Đổi mật khẩu thành công!",
+            "error_password": "Không thể đổi mật khẩu"
+        },
+        "settings": {
+            "notifications": {
+                "title": "Thông báo",
+                "email_title": "Email thông báo",
+                "email_desc": "Nhận thông báo về giao dịch mới qua email",
+                "push_title": "Thông báo đẩy",
+                "push_desc": "Nhận thông báo trực tiếp trên trình duyệt"
+            },
+            "interface": {
+                "title": "Giao diện & Ngôn ngữ"
+            }
+        }
+    }
+}

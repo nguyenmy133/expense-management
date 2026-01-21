@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { transactionAPI, budgetAPI } from '../services/api';
 import {
@@ -23,6 +24,7 @@ import FloatingActionButton from '../components/dashboard/FloatingActionButton';
 
 export default function DashboardPage() {
     const { user, signOut } = useAuth();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [trendData, setTrendData] = useState(null);
@@ -72,11 +74,13 @@ export default function DashboardPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                            Xin chào, {user?.fullName?.split(' ').pop() || 'bạn'}!
+                            {t('dashboard.title', { name: user?.fullName?.split(' ').pop() || 'User' })}
                         </h2>
                         <Sparkles className="w-7 h-7 text-primary animate-pulse" />
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400">Tổng quan chi tiêu của bạn trong tháng {currentMonth}</p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                        {t('dashboard.subtitle', { month: currentMonth })}
+                    </p>
                 </div>
 
                 {/* Time Range Dropdown */}
@@ -86,9 +90,9 @@ export default function DashboardPage() {
                         onChange={(e) => setTimeRange(e.target.value)}
                         className="appearance-none bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 py-2.5 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium shadow-sm transition-all cursor-pointer hover:border-primary/50"
                     >
-                        <option value="today">Hôm nay</option>
-                        <option value="week">Tuần này</option>
-                        <option value="month">Tháng này</option>
+                        <option value="today">{t('dashboard.time_range.today')}</option>
+                        <option value="week">{t('dashboard.time_range.week')}</option>
+                        <option value="month">{t('dashboard.time_range.month')}</option>
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
                         <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -102,14 +106,14 @@ export default function DashboardPage() {
             {loading ? (
                 <div className="text-center py-12">
                     <Loader2 className="inline-block w-12 h-12 text-primary animate-spin" />
-                    <p className="mt-4 text-gray-600 dark:text-gray-400">Đang tải dữ liệu...</p>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">{t('dashboard.loading')}</p>
                 </div>
             ) : (
                 <>
                     {/* Enhanced Stat Cards with Sparklines */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <StatCard
-                            title="Thu nhập"
+                            title={t('dashboard.stats.income')}
                             value={stats?.totalIncome || 0}
                             currency="VNĐ"
                             trend={trendData?.income?.percentageChange}
@@ -118,7 +122,7 @@ export default function DashboardPage() {
                             icon={TrendingUp}
                         />
                         <StatCard
-                            title="Chi tiêu"
+                            title={t('dashboard.stats.expense')}
                             value={stats?.totalExpense || 0}
                             currency="VNĐ"
                             trend={trendData?.expense?.percentageChange}
@@ -127,7 +131,7 @@ export default function DashboardPage() {
                             icon={TrendingDown}
                         />
                         <StatCard
-                            title="Số dư"
+                            title={t('dashboard.stats.balance')}
                             value={stats?.balance || 0}
                             currency="VNĐ"
                             trend={trendData?.balance?.percentageChange}
@@ -161,10 +165,10 @@ export default function DashboardPage() {
                     <div>
                         <div className="flex items-center gap-2 mb-2">
                             <Sparkles className="w-5 h-5" />
-                            <h4 className="text-lg font-semibold">Mẹo quản lý chi tiêu</h4>
+                            <h4 className="text-lg font-semibold">{t('dashboard.tip.title')}</h4>
                         </div>
                         <p className="text-sm opacity-90">
-                            Hãy ghi chép mọi khoản chi tiêu hàng ngày để kiểm soát tài chính tốt hơn!
+                            {t('dashboard.tip.content')}
                         </p>
                     </div>
                     <div className="hidden md:block">

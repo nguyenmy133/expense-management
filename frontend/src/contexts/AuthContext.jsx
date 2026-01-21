@@ -68,6 +68,10 @@ export const AuthProvider = ({ children }) => {
         signUp,
         signIn,
         signOut,
+        updateUser: (userData) => {
+            localStorage.setItem('user', JSON.stringify(userData));
+            setUser(userData);
+        }
     };
 
     return (

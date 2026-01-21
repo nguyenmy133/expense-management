@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { budgetAPI, categoryAPI } from '../services/api';
 import { Plus, Calendar, AlertTriangle, Edit, ExternalLink, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function BudgetsPage() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [budgets, setBudgets] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -94,7 +96,7 @@ export default function BudgetsPage() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Bạn có chắc muốn xóa ngân sách này?')) return;
+        if (!window.confirm(t('common.confirm_delete'))) return;
         try {
             await budgetAPI.delete(id);
             loadData();
@@ -115,15 +117,15 @@ export default function BudgetsPage() {
             {/* Page Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Ngân sách</h1>
-                    <p className="text-gray-600 dark:text-gray-400">Lập kế hoạch và kiểm soát chi tiêu</p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('budgets.title')}</h1>
+                    <p className="text-gray-600 dark:text-gray-400">{t('budgets.subtitle')}</p>
                 </div>
                 <button
                     onClick={handleOpenCreateModal}
                     className="btn-primary flex items-center gap-2"
                 >
                     <Plus className="w-5 h-5" />
-                    <span className="hidden sm:inline">Thêm ngân sách</span>
+                    <span className="hidden sm:inline">{t('budgets.add_button')}</span>
                 </button>
             </div>
 
@@ -131,7 +133,7 @@ export default function BudgetsPage() {
             <main className="max-w-7xl mx-auto">
                 <div className="mb-6 flex items-center gap-2 text-primary font-medium bg-primary/10 w-fit px-4 py-2 rounded-lg">
                     <Calendar className="w-5 h-5" />
-                    Tháng {currentDate.getMonth() + 1}/{currentDate.getFullYear()}
+                    {t('transactions.filters.this_month')} {currentDate.getMonth() + 1}/{currentDate.getFullYear()}
                 </div>
 
                 {loading ? (
@@ -145,10 +147,10 @@ export default function BudgetsPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Chưa có ngân sách nào</h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-4">Lập kế hoạch chi tiêu để quản lý tài chính tốt hơn!</p>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('budgets.empty.title')}</h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-4">{t('budgets.empty.subtitle')}</p>
                         <button onClick={handleOpenCreateModal} className="btn-primary">
-                            Tạo ngân sách đầu tiên
+                            {t('budgets.empty.create_first')}
                         </button>
                     </div>
                 ) : (
@@ -163,18 +165,18 @@ export default function BudgetsPage() {
                                                 <div className="group/tooltip relative">
                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 cursor-help">
                                                         <AlertTriangle className="w-3 h-3" />
-                                                        Vượt ngân sách
+                                                        {t('budgets.card.over_budget')}
                                                     </span>
                                                     {/* Tooltip */}
                                                     <div className="absolute left-0 bottom-full mb-2 hidden group-hover/tooltip:block w-max px-3 py-1.5 bg-gray-800 text-white text-xs rounded shadow-xl z-20 whitespace-nowrap">
-                                                        Bạn đã chi vượt {(budget.spent - budget.amount).toLocaleString('vi-VN')}đ
+                                                        {t('budgets.card.over_amount', { amount: (budget.spent - budget.amount).toLocaleString('vi-VN') })}
                                                         <div className="absolute left-4 top-full w-2 h-2 bg-gray-800 rotate-45 -mt-1"></div>
                                                     </div>
                                                 </div>
                                             )}
                                         </div>
                                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                            {budget.spent.toLocaleString('vi-VN')} / {budget.amount.toLocaleString('vi-VN')} đ
+                                            {budget.spent.toLocaleString('vi-VN')} / {budget.amount.toLocaleString('vi-VN')} {t('common.currency_symbol')}
                                         </p>
                                     </div>
                                     <div className="flex gap-1">
@@ -198,7 +200,7 @@ export default function BudgetsPage() {
                                 {/* Progress Bar */}
                                 <div className="mb-3">
                                     <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-600 dark:text-gray-400">Đã dùng</span>
+                                        <span className="text-gray-600 dark:text-gray-400">{t('budgets.card.spent')}</span>
                                         <span className={`font-semibold ${budget.percentage >= 100 ? 'text-red-600 dark:text-red-400' :
                                             budget.percentage >= 80 ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'
                                             }`}>
@@ -221,14 +223,14 @@ export default function BudgetsPage() {
                                             className="flex-1 text-xs flex items-center justify-center gap-1 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 transition-colors font-medium border border-red-100 dark:border-red-900/50"
                                         >
                                             <Edit className="w-3 h-3" />
-                                            Điều chỉnh ngân sách
+                                            {t('budgets.card.adjust')}
                                         </button>
                                         <button
                                             onClick={() => handleViewTransactions(budget.categoryId)}
                                             className="flex-1 text-xs flex items-center justify-center gap-1 py-1.5 rounded bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 transition-colors font-medium border border-gray-200 dark:border-gray-700"
                                         >
                                             <ExternalLink className="w-3 h-3" />
-                                            Xem giao dịch
+                                            {t('budgets.card.view_tx')}
                                         </button>
                                     </div>
                                 )}
@@ -236,10 +238,10 @@ export default function BudgetsPage() {
                                 {/* Normal State Warning */}
                                 {budget.percentage < 100 && (
                                     <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-800">
-                                        <span className="text-sm text-gray-600 dark:text-gray-400">Còn lại</span>
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('budgets.card.remaining')}</span>
                                         <span className={`text-lg font-bold ${budget.remaining < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
                                             }`}>
-                                            {budget.remaining.toLocaleString('vi-VN')} đ
+                                            {budget.remaining.toLocaleString('vi-VN')} {t('common.currency_symbol')}
                                         </span>
                                     </div>
                                 )}
@@ -255,7 +257,7 @@ export default function BudgetsPage() {
                     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl max-w-md w-full p-6 border border-gray-200 dark:border-gray-800 animate-scale-in">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                                {modalMode === 'create' ? 'Thêm ngân sách' : 'Điều chỉnh ngân sách'}
+                                {modalMode === 'create' ? t('budgets.modal.create_title') : t('budgets.modal.edit_title')}
                             </h2>
                             <button onClick={() => setShowModal(false)} className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -266,7 +268,7 @@ export default function BudgetsPage() {
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Danh mục</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('transactions.modal.category')}</label>
                                 <select
                                     value={formData.categoryId}
                                     onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
@@ -274,7 +276,7 @@ export default function BudgetsPage() {
                                     required
                                     disabled={modalMode === 'edit'} // Usually we don't change category in edit, or allow it
                                 >
-                                    <option value="">Chọn danh mục chi tiêu</option>
+                                    <option value="">{t('transactions.modal.select_category')}</option>
                                     {categories.map(cat => (
                                         <option key={cat.id} value={cat.id}>{cat.icon} {cat.name}</option>
                                     ))}
@@ -282,7 +284,7 @@ export default function BudgetsPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Số tiền</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('transactions.modal.amount')}</label>
                                 <input
                                     type="number"
                                     value={formData.amount}
@@ -297,7 +299,7 @@ export default function BudgetsPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tháng</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('budgets.modal.month')}</label>
                                     <input
                                         type="number"
                                         value={formData.month}
@@ -309,7 +311,7 @@ export default function BudgetsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Năm</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('budgets.modal.year')}</label>
                                     <input
                                         type="number"
                                         value={formData.year}
@@ -323,10 +325,10 @@ export default function BudgetsPage() {
 
                             <div className="flex gap-3 pt-4">
                                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 btn-secondary">
-                                    Hủy
+                                    {t('common.cancel')}
                                 </button>
                                 <button type="submit" className="flex-1 btn-primary">
-                                    {modalMode === 'create' ? 'Thêm' : 'Lưu thay đổi'}
+                                    {modalMode === 'create' ? t('common.add') : t('common.save')}
                                 </button>
                             </div>
                         </form>

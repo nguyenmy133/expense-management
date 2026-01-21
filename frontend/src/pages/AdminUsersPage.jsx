@@ -15,8 +15,10 @@ import {
     EyeOff
 } from 'lucide-react';
 import { adminAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminUsersPage() {
+    const { t } = useTranslation();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -86,7 +88,7 @@ export default function AdminUsersPage() {
 
             // Validate form
             if (!formData.fullName.trim() || !formData.email.trim()) {
-                alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+                alert(t('admin.users.messages.required_fields'));
                 return;
             }
 
@@ -101,7 +103,7 @@ export default function AdminUsersPage() {
             } else {
                 // Create new user
                 if (!formData.password) {
-                    alert('Vui lòng nhập mật khẩu cho người dùng mới');
+                    alert(t('admin.users.messages.password_required'));
                     return;
                 }
                 await adminAPI.create({
@@ -118,21 +120,21 @@ export default function AdminUsersPage() {
         } catch (error) {
             console.error('Error saving user:', error);
             const message = error.response?.data?.message || error.message;
-            alert(editingUser ? `Lỗi khi cập nhật người dùng: ${message}` : `Lỗi khi tạo người dùng: ${message}`);
+            alert(editingUser ? `${t('admin.users.messages.error_save')}: ${message}` : `${t('admin.users.messages.error_save')}: ${message}`);
         } finally {
             setSaving(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
+        if (!confirm(t('admin.users.messages.confirm_delete'))) return;
 
         try {
             await adminAPI.deleteUser(id);
             await fetchUsers();
         } catch (error) {
             console.error('Error deleting user:', error);
-            alert('Lỗi khi xóa người dùng: ' + (error.response?.data?.message || error.message));
+            alert(t('admin.users.messages.error_delete') + ': ' + (error.response?.data?.message || error.message));
         }
     };
 
@@ -181,10 +183,10 @@ export default function AdminUsersPage() {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                        Quản lý Người dùng
+                        {t('admin.users.title')}
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400">
-                        Quản lý tài khoản người dùng trong hệ thống
+                        {t('admin.users.subtitle')}
                     </p>
                 </div>
 
@@ -193,7 +195,7 @@ export default function AdminUsersPage() {
                     <div className="card-modern p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Tổng người dùng</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('admin.users.total')}</p>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
                             </div>
                             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
@@ -205,7 +207,7 @@ export default function AdminUsersPage() {
                     <div className="card-modern p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Quản trị viên</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('admin.users.admins')}</p>
                                 <p className="text-3xl font-bold text-primary">{stats.admins}</p>
                             </div>
                             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
@@ -217,7 +219,7 @@ export default function AdminUsersPage() {
                     <div className="card-modern p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Người dùng thường</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('admin.users.regular_users')}</p>
                                 <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.users}</p>
                             </div>
                             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
@@ -235,7 +237,7 @@ export default function AdminUsersPage() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Tìm kiếm người dùng..."
+                                placeholder={t('admin.users.search_placeholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="input-modern pl-10 w-full"
@@ -248,7 +250,7 @@ export default function AdminUsersPage() {
                             className="btn-primary flex items-center gap-2 w-full md:w-auto"
                         >
                             <UserPlus className="w-5 h-5" />
-                            <span>Thêm người dùng</span>
+                            <span>{t('admin.users.add_button')}</span>
                         </button>
                     </div>
                 </div>
@@ -262,7 +264,7 @@ export default function AdminUsersPage() {
                     ) : filteredUsers.length === 0 ? (
                         <div className="text-center py-12">
                             <Users className="w-16 h-16 text-gray-300 dark:text-gray-700 mx-auto mb-4" />
-                            <p className="text-gray-600 dark:text-gray-400">Không tìm thấy người dùng nào</p>
+                            <p className="text-gray-600 dark:text-gray-400">{t('admin.users.empty')}</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
@@ -270,19 +272,19 @@ export default function AdminUsersPage() {
                                 <thead className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
                                     <tr>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                            Họ tên
+                                            {t('admin.users.table.name')}
                                         </th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                            Email
+                                            {t('admin.users.table.email')}
                                         </th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                            Vai trò
+                                            {t('admin.users.table.role')}
                                         </th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                            Ngày tạo
+                                            {t('admin.users.table.created_at')}
                                         </th>
                                         <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                            Thao tác
+                                            {t('admin.users.table.actions')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -311,7 +313,7 @@ export default function AdminUsersPage() {
                                                     : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                                                     }`}>
                                                     <Shield className="w-3 h-3" />
-                                                    {user.role === 'ADMIN' ? 'Quản trị viên' : 'Người dùng'}
+                                                    {user.role === 'ADMIN' ? t('admin.users.modal.role_admin') : t('admin.users.modal.role_user')}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
@@ -325,14 +327,14 @@ export default function AdminUsersPage() {
                                                     <button
                                                         onClick={() => handleOpenModal(user)}
                                                         className="p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
-                                                        title="Chỉnh sửa"
+                                                        title={t('common.edit')}
                                                     >
                                                         <Edit2 className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(user.id)}
                                                         className="p-2 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/30 transition-colors"
-                                                        title="Xóa"
+                                                        title={t('common.delete')}
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
@@ -354,7 +356,7 @@ export default function AdminUsersPage() {
                         {/* Modal Header */}
                         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                                {editingUser ? 'Chỉnh sửa người dùng' : 'Thêm người dùng mới'}
+                                {editingUser ? t('admin.users.modal.edit_title') : t('admin.users.modal.create_title')}
                             </h2>
                             <button
                                 onClick={handleCloseModal}
@@ -369,13 +371,13 @@ export default function AdminUsersPage() {
                             {/* Full Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Họ và tên
+                                    {t('admin.users.modal.name')}
                                 </label>
                                 <input
                                     type="text"
                                     value={formData.fullName}
                                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                    placeholder="Nhập họ và tên..."
+                                    placeholder={t('admin.users.modal.name_placeholder')}
                                     className="input-modern w-full"
                                 />
                             </div>
@@ -383,13 +385,13 @@ export default function AdminUsersPage() {
                             {/* Email */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Email
+                                    {t('admin.users.modal.email')}
                                 </label>
                                 <input
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    placeholder="Nhập email..."
+                                    placeholder={t('admin.users.modal.email_placeholder')}
                                     className="input-modern w-full"
                                     disabled={!!editingUser}
                                 />
@@ -398,14 +400,14 @@ export default function AdminUsersPage() {
                             {/* Password */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Mật khẩu {editingUser && '(để trống nếu không đổi)'}
+                                    {t('admin.users.modal.password')} {editingUser && t('admin.users.modal.password_hint')}
                                 </label>
                                 <div className="relative">
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        placeholder="Nhập mật khẩu..."
+                                        placeholder={t('admin.users.modal.password_placeholder')}
                                         className="input-modern w-full pr-10"
                                     />
                                     <button
@@ -421,15 +423,15 @@ export default function AdminUsersPage() {
                             {/* Role */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Vai trò
+                                    {t('admin.users.modal.role')}
                                 </label>
                                 <select
                                     value={formData.role}
                                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                                     className="input-modern w-full"
                                 >
-                                    <option value="USER">Người dùng</option>
-                                    <option value="ADMIN">Quản trị viên</option>
+                                    <option value="USER">{t('admin.users.modal.role_user')}</option>
+                                    <option value="ADMIN">{t('admin.users.modal.role_admin')}</option>
                                 </select>
                             </div>
                         </div>
@@ -441,7 +443,7 @@ export default function AdminUsersPage() {
                                 className="btn-secondary"
                                 disabled={saving}
                             >
-                                Hủy
+                                {t('common.cancel')}
                             </button>
                             <button
                                 onClick={handleSave}
@@ -451,12 +453,12 @@ export default function AdminUsersPage() {
                                 {saving ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        Đang lưu...
+                                        {t('admin.system.saving')}
                                     </>
                                 ) : (
                                     <>
                                         <Save className="w-4 h-4" />
-                                        Lưu
+                                        {t('common.save')}
                                     </>
                                 )}
                             </button>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { transactionAPI, categoryAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 import {
     Plus,
     Loader2,
@@ -18,6 +19,7 @@ import {
 import { toast } from 'react-hot-toast';
 
 export default function TransactionsPage() {
+    const { t } = useTranslation();
     const location = useLocation();
     const [transactions, setTransactions] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -229,30 +231,30 @@ export default function TransactionsPage() {
 
             if (modalMode === 'create') {
                 await transactionAPI.create(payload);
-                toast.success('Thêm giao dịch thành công!');
+                toast.success(t('transactions.messages.add_success'));
             } else if (modalMode === 'edit' && selectedTx) {
                 await transactionAPI.update(selectedTx.id, payload);
-                toast.success('Cập nhật giao dịch thành công!');
+                toast.success(t('transactions.messages.update_success'));
             }
 
             setShowModal(false);
             loadData();
         } catch (error) {
             console.error('Failed to save transaction:', error);
-            toast.error('Lưu giao dịch thất bại!');
+            toast.error(t('transactions.messages.save_error'));
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Bạn có chắc muốn xóa giao dịch này?')) return;
+        if (!window.confirm(t('common.confirm_delete'))) return;
         try {
             await transactionAPI.delete(id);
-            toast.success('Xóa giao dịch thành công!');
+            toast.success(t('transactions.messages.delete_success'));
             setShowModal(false);
             loadData();
         } catch (error) {
             console.error('Failed to delete:', error);
-            toast.error('Xóa thất bại!');
+            toast.error(t('transactions.messages.delete_error'));
         }
     };
 
@@ -266,15 +268,15 @@ export default function TransactionsPage() {
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Giao dịch</h1>
-                    <p className="text-gray-600 dark:text-gray-400">Quản lý thu chi của bạn</p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('transactions.title')}</h1>
+                    <p className="text-gray-600 dark:text-gray-400">{t('transactions.subtitle')}</p>
                 </div>
                 <button
                     onClick={() => handleOpenCreateModal()}
                     className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center"
                 >
                     <Plus className="w-5 h-5" />
-                    <span>Thêm giao dịch</span>
+                    <span>{t('transactions.add_button')}</span>
                 </button>
             </div>
 
@@ -286,7 +288,7 @@ export default function TransactionsPage() {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="Tìm kiếm ghi chú..."
+                            placeholder={t('transactions.search_placeholder')}
                             value={filters.search}
                             onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                             onKeyDown={(e) => e.key === 'Enter' && loadData()}
@@ -300,7 +302,7 @@ export default function TransactionsPage() {
                         onChange={(e) => setFilters(prev => ({ ...prev, categoryId: e.target.value }))}
                         className="input-field py-2 text-sm"
                     >
-                        <option value="ALL">Tất cả danh mục</option>
+                        <option value="ALL">{t('transactions.filters.all_categories')}</option>
                         {categories.map(cat => (
                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
@@ -313,13 +315,13 @@ export default function TransactionsPage() {
                             onChange={handlePresetChange}
                             className="input-field py-2 text-sm w-full"
                         >
-                            <option value="ALL">Tất cả thời gian</option>
-                            <option value="TODAY">Hôm nay</option>
-                            <option value="THIS_WEEK">Tuần này</option>
-                            <option value="THIS_MONTH">Tháng này</option>
-                            <option value="LAST_MONTH">Tháng trước</option>
+                            <option value="ALL">{t('transactions.filters.all_time')}</option>
+                            <option value="TODAY">{t('transactions.filters.today')}</option>
+                            <option value="THIS_WEEK">{t('transactions.filters.this_week')}</option>
+                            <option value="THIS_MONTH">{t('transactions.filters.this_month')}</option>
+                            <option value="LAST_MONTH">{t('transactions.filters.last_month')}</option>
                             <option value="CUSTOM" disabled>──────────</option>
-                            <option value="CUSTOM">Tùy chọn...</option>
+                            <option value="CUSTOM">{t('transactions.filters.custom')}</option>
                         </select>
 
                         {/* Show inputs ONLY if CUSTOM preset is selected */}
@@ -330,14 +332,14 @@ export default function TransactionsPage() {
                                     className="input-field py-2 text-sm px-2 w-[110px]"
                                     value={filters.startDate}
                                     onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
-                                    title="Từ ngày"
+                                    title={t('transactions.filters.from_date')}
                                 />
                                 <input
                                     type="date"
                                     className="input-field py-2 text-sm px-2 w-[110px]"
                                     value={filters.endDate}
                                     onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
-                                    title="Đến ngày"
+                                    title={t('transactions.filters.to_date')}
                                 />
                             </>
                         )}
@@ -350,15 +352,15 @@ export default function TransactionsPage() {
                 {loading ? (
                     <div className="text-center py-12">
                         <Loader2 className="inline-block w-12 h-12 text-primary animate-spin" />
-                        <p className="mt-4 text-gray-600 dark:text-gray-400">Đang tải dữ liệu...</p>
+                        <p className="mt-4 text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
                     </div>
                 ) : transactions.length === 0 ? (
                     <div className="text-center py-12">
                         <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Receipt className="w-12 h-12 text-gray-400 dark:text-gray-500" />
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Không tìm thấy giao dịch nào</h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-4">Thử thay đổi bộ lọc hoặc thêm giao dịch mới</p>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('transactions.empty.title')}</h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-4">{t('transactions.empty.subtitle')}</p>
                     </div>
                 ) : (
                     <div className="space-y-4">
@@ -414,9 +416,9 @@ export default function TransactionsPage() {
                         {/* Modal Header */}
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                                {modalMode === 'create' && 'Thêm giao dịch'}
-                                {modalMode === 'edit' && 'Chỉnh sửa giao dịch'}
-                                {modalMode === 'view' && 'Chi tiết giao dịch'}
+                                {modalMode === 'create' && t('transactions.modal.create_title')}
+                                {modalMode === 'edit' && t('transactions.modal.edit_title')}
+                                {modalMode === 'view' && t('transactions.modal.view_title')}
                             </h2>
                             <button
                                 onClick={() => setShowModal(false)}
@@ -438,7 +440,7 @@ export default function TransactionsPage() {
                                     </div>
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{selectedTx.categoryName}</h3>
                                     <p className={`text-3xl font-bold mt-2 ${selectedTx.type === 'INCOME' ? 'text-success-600' : 'text-danger-600'}`}>
-                                        {selectedTx.type === 'INCOME' ? '+' : '-'}{selectedTx.amount.toLocaleString('vi-VN')} đ
+                                        {selectedTx.type === 'INCOME' ? '+' : '-'}{selectedTx.amount.toLocaleString('vi-VN')} {t('common.currency_symbol')}
                                     </p>
                                 </div>
 
@@ -446,7 +448,7 @@ export default function TransactionsPage() {
                                     <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/30">
                                         <Calendar className="w-5 h-5 text-gray-500 mt-0.5" />
                                         <div>
-                                            <p className="text-xs text-gray-500 uppercase font-semibold">Ngày giao dịch</p>
+                                            <p className="text-xs text-gray-500 uppercase font-semibold">{t('transactions.modal.date')}</p>
                                             <p className="text-gray-900 dark:text-white">
                                                 {new Date(selectedTx.transactionDate).toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                                             </p>
@@ -457,7 +459,7 @@ export default function TransactionsPage() {
                                         <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/30">
                                             <Edit2 className="w-5 h-5 text-gray-500 mt-0.5" />
                                             <div>
-                                                <p className="text-xs text-gray-500 uppercase font-semibold">Ghi chú</p>
+                                                <p className="text-xs text-gray-500 uppercase font-semibold">{t('transactions.modal.note')}</p>
                                                 <p className="text-gray-900 dark:text-white whitespace-pre-wrap">{selectedTx.note}</p>
                                             </div>
                                         </div>
@@ -470,14 +472,14 @@ export default function TransactionsPage() {
                                         className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-danger-600 bg-danger-50 hover:bg-danger-100 dark:bg-danger-900/20 dark:hover:bg-danger-900/40 transition-colors font-medium"
                                     >
                                         <Trash2 className="w-4 h-4" />
-                                        Xóa
+                                        {t('common.delete')}
                                     </button>
                                     <button
                                         onClick={handleEditTransaction}
                                         className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-white bg-primary hover:bg-primary-600 transition-colors font-medium shadow-lg shadow-primary/30"
                                     >
                                         <Edit2 className="w-4 h-4" />
-                                        Chỉnh sửa
+                                        {t('common.edit')}
                                     </button>
                                 </div>
                             </div>
@@ -487,7 +489,7 @@ export default function TransactionsPage() {
                         {(modalMode === 'create' || modalMode === 'edit') && (
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Loại</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('transactions.modal.type')}</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <button
                                             type="button"
@@ -498,7 +500,7 @@ export default function TransactionsPage() {
                                                 }`}
                                         >
                                             <TrendingDown className="w-4 h-4" />
-                                            Chi tiêu
+                                            {t('transactions.modal.expense')}
                                         </button>
                                         <button
                                             type="button"
@@ -509,20 +511,20 @@ export default function TransactionsPage() {
                                                 }`}
                                         >
                                             <TrendingUp className="w-4 h-4" />
-                                            Thu nhập
+                                            {t('transactions.modal.income')}
                                         </button>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Danh mục</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('transactions.modal.category')}</label>
                                     <select
                                         value={formData.categoryId}
                                         onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                                         className="input-field"
                                         required
                                     >
-                                        <option value="">Chọn danh mục</option>
+                                        <option value="">{t('transactions.modal.select_category')}</option>
                                         {categories
                                             .filter(cat => cat.type === formData.type)
                                             .map(cat => (
@@ -532,7 +534,7 @@ export default function TransactionsPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Số tiền</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('transactions.modal.amount')}</label>
                                     <div className="relative">
                                         <input
                                             type="number"
@@ -549,7 +551,7 @@ export default function TransactionsPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ngày</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('transactions.modal.date')}</label>
                                     <input
                                         type="date"
                                         value={formData.transactionDate}
@@ -560,13 +562,13 @@ export default function TransactionsPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ghi chú</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('transactions.modal.note')}</label>
                                     <textarea
                                         value={formData.note}
                                         onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                                         className="input-field min-h-[100px]"
                                         rows="3"
-                                        placeholder="Nhập ghi chú cho giao dịch..."
+                                        placeholder={t('transactions.modal.note_placeholder')}
                                     />
                                 </div>
 
@@ -576,10 +578,10 @@ export default function TransactionsPage() {
                                         onClick={() => setShowModal(false)}
                                         className="flex-1 btn-secondary"
                                     >
-                                        Hủy
+                                        {t('common.cancel')}
                                     </button>
                                     <button type="submit" className="flex-1 btn-primary">
-                                        {modalMode === 'edit' ? 'Lưu thay đổi' : 'Thêm giao dịch'}
+                                        {modalMode === 'edit' ? t('common.save') : t('transactions.modal.create_title')}
                                     </button>
                                 </div>
                             </form>

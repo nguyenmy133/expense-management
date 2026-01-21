@@ -7,8 +7,10 @@ import {
     ResponsiveContainer
 } from 'recharts';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function ReportsPage() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [monthlyReport, setMonthlyReport] = useState(null);
     const [dailyExpenses, setDailyExpenses] = useState([]); // State for Line Chart
@@ -91,8 +93,8 @@ export default function ReportsPage() {
     };
 
     const months = [
-        'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-        'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
     // Colors for Pie Chart
@@ -121,8 +123,8 @@ export default function ReportsPage() {
             {/* Professional Header with Integrated Date Navigator */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Báo cáo tài chính</h1>
-                    <p className="text-gray-600 dark:text-gray-400">Tổng quan tình hình thu chi của bạn</p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('reports.title')}</h1>
+                    <p className="text-gray-600 dark:text-gray-400">{t('reports.subtitle')}</p>
                 </div>
 
                 {/* Date Navigator */}
@@ -146,7 +148,7 @@ export default function ReportsPage() {
                                 className="appearance-none bg-transparent font-bold text-gray-900 dark:text-white text-lg focus:outline-none cursor-pointer hover:text-primary transition-colors text-right pr-1"
                             >
                                 {months.map((month, index) => (
-                                    <option key={index} value={index + 1}>{month}</option>
+                                    <option key={index} value={index + 1}>{t(`transactions.filters.this_month`)} {index + 1}</option>
                                 ))}
                             </select>
 
@@ -183,28 +185,28 @@ export default function ReportsPage() {
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <div className="card bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-100 dark:border-green-800">
-                                <p className="text-sm font-medium text-green-700 dark:text-green-400 mb-2">Tổng thu nhập</p>
+                                <p className="text-sm font-medium text-green-700 dark:text-green-400 mb-2">{t('reports.summary.total_income')}</p>
                                 <p className="text-3xl font-bold text-green-600 dark:text-green-400">
                                     {(monthlyReport?.totalIncome || 0).toLocaleString('vi-VN')}
                                 </p>
-                                <p className="text-xs text-green-600 dark:text-green-500 mt-1">VNĐ</p>
+                                <p className="text-xs text-green-600 dark:text-green-500 mt-1">{t('common.currency_symbol')}</p>
                             </div>
 
                             <div className="card bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border border-red-100 dark:border-red-800">
-                                <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-2">Tổng chi tiêu</p>
+                                <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-2">{t('reports.summary.total_expense')}</p>
                                 <p className="text-3xl font-bold text-red-600 dark:text-red-400">
                                     {(monthlyReport?.totalExpense || 0).toLocaleString('vi-VN')}
                                 </p>
-                                <p className="text-xs text-red-600 dark:text-red-500 mt-1">VNĐ</p>
+                                <p className="text-xs text-red-600 dark:text-red-500 mt-1">{t('common.currency_symbol')}</p>
                             </div>
 
                             <div className="card bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-100 dark:border-blue-800">
-                                <p className="text-sm font-medium text-[#1261A6] dark:text-blue-400 mb-2">Số dư</p>
+                                <p className="text-sm font-medium text-[#1261A6] dark:text-blue-400 mb-2">{t('reports.summary.balance')}</p>
                                 <p className={`text-3xl font-bold ${(monthlyReport?.balance || 0) >= 0 ? 'text-[#079DD9] dark:text-blue-400' : 'text-red-600 dark:text-red-400'
                                     }`}>
                                     {(monthlyReport?.balance || 0).toLocaleString('vi-VN')}
                                 </p>
-                                <p className="text-xs text-[#079DD9] dark:text-blue-500 mt-1">VNĐ</p>
+                                <p className="text-xs text-[#079DD9] dark:text-blue-500 mt-1">{t('common.currency_symbol')}</p>
                             </div>
                         </div>
 
@@ -212,7 +214,7 @@ export default function ReportsPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                             {/* 1. PIE CHART: Expense by Category */}
                             <div className="card min-h-[400px] flex flex-col">
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Phân bổ chi tiêu</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('reports.charts.distribution')}</h3>
                                 {(monthlyReport?.categoryBreakdown && monthlyReport.categoryBreakdown.length > 0) ? (
                                     <div className="flex-1">
                                         <ResponsiveContainer width="100%" height={300}>
@@ -231,7 +233,7 @@ export default function ReportsPage() {
                                                     ))}
                                                 </Pie>
                                                 <Tooltip
-                                                    formatter={(value) => new Intl.NumberFormat('vi-VN').format(value) + ' đ'}
+                                                    formatter={(value) => new Intl.NumberFormat('vi-VN').format(value) + ` ${t('common.currency_symbol')}`}
                                                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                                 />
                                                 <Legend layout="horizontal" verticalAlign="bottom" align="center" />
@@ -240,21 +242,21 @@ export default function ReportsPage() {
                                     </div>
                                 ) : (
                                     <div className="flex-1 flex items-center justify-center text-gray-500">
-                                        Chưa có dữ liệu chi tiêu
+                                        {t('reports.charts.no_data')}
                                     </div>
                                 )}
                             </div>
 
                             {/* 2. LINE CHART: Expense by Day */}
                             <div className="card min-h-[400px] flex flex-col">
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Xu hướng chi tiêu trong tháng</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('reports.charts.trend')}</h3>
                                 <div className="flex-1">
                                     <ResponsiveContainer width="100%" height={300}>
                                         <LineChart data={dailyExpenses} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
                                             <XAxis
                                                 dataKey="day"
-                                                label={{ value: 'Ngày', position: 'insideBottomRight', offset: 0 }}
+                                                label={{ value: t('reports.charts.day'), position: 'insideBottomRight', offset: 0 }}
                                                 tick={{ fontSize: 12 }}
                                             />
                                             <YAxis
@@ -262,8 +264,8 @@ export default function ReportsPage() {
                                                 tick={{ fontSize: 12 }}
                                             />
                                             <Tooltip
-                                                labelFormatter={(day) => `Ngày ${day}`}
-                                                formatter={(value) => [new Intl.NumberFormat('vi-VN').format(value) + ' đ', 'Chi tiêu']}
+                                                labelFormatter={(day) => `${t('reports.charts.day')} ${day}`}
+                                                formatter={(value) => [new Intl.NumberFormat('vi-VN').format(value) + ` ${t('common.currency_symbol')}`, t('reports.charts.expense')]}
                                                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                             />
                                             <Line
@@ -282,11 +284,11 @@ export default function ReportsPage() {
 
                         {/* Detailed List (Optional, can keep) */}
                         <div className="card">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Chi tiết theo danh mục</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('reports.list.title')}</h3>
                             {/* ... existing list ... code reused */}
                             {!monthlyReport?.categoryBreakdown || monthlyReport.categoryBreakdown.length === 0 ? (
                                 <div className="text-center py-8">
-                                    <p className="text-gray-600 dark:text-gray-400">Chưa có dữ liệu chi tiêu trong tháng này</p>
+                                    <p className="text-gray-600 dark:text-gray-400">{t('reports.list.empty')}</p>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
@@ -298,7 +300,7 @@ export default function ReportsPage() {
                                                     <div>
                                                         <p className="font-medium text-gray-900 dark:text-white">{cat.categoryName}</p>
                                                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                            {cat.amount.toLocaleString('vi-VN')} đ
+                                                            {cat.amount.toLocaleString('vi-VN')} {t('common.currency_symbol')}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -323,22 +325,22 @@ export default function ReportsPage() {
                         {/* Insights */}
                         <div className="card mt-6 gradient-primary text-white">
                             {/* ... existing insights ... */}
-                            <h3 className="text-lg font-semibold mb-3">💡 Phân tích</h3>
+                            <h3 className="text-lg font-semibold mb-3">💡 {t('reports.analysis.title')}</h3>
                             <div className="space-y-2 text-sm opacity-90">
                                 {monthlyReport?.balance >= 0 ? (
                                     <>
-                                        <p>✓ Bạn đang quản lý tài chính tốt! Thu nhập lớn hơn chi tiêu.</p>
-                                        <p>✓ Hãy tiếp tục duy trì thói quen tốt này.</p>
+                                        <p>✓ {t('reports.analysis.good')}</p>
+                                        <p>✓ {t('reports.analysis.keep_up')}</p>
                                     </>
                                 ) : (
                                     <>
-                                        <p>⚠ Chi tiêu của bạn đang vượt quá thu nhập.</p>
-                                        <p>⚠ Hãy xem xét cắt giảm các khoản chi không cần thiết.</p>
+                                        <p>⚠ {t('reports.analysis.bad')}</p>
+                                        <p>⚠ {t('reports.analysis.cut_down')}</p>
                                     </>
                                 )}
                                 {monthlyReport?.categoryBreakdown && monthlyReport.categoryBreakdown.length > 0 && (
                                     <p>
-                                        📊 Danh mục chi tiêu nhiều nhất: {monthlyReport.categoryBreakdown[0]?.categoryName}
+                                        📊 {t('reports.analysis.top_category')}: {monthlyReport.categoryBreakdown[0]?.categoryName}
                                         ({monthlyReport.categoryBreakdown[0]?.percentage.toFixed(1)}%)
                                     </p>
                                 )}

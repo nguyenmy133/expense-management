@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { authAPI } from '../services/api';
 import {
     User,
     Mail,
@@ -14,9 +15,11 @@ import {
     CheckCircle2,
     AlertCircle
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfilePage() {
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
+    const { t, i18n } = useTranslation();
     const [activeTab, setActiveTab] = useState('general');
     const [isLoading, setIsLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
@@ -25,9 +28,9 @@ export default function ProfilePage() {
     const [formData, setFormData] = useState({
         fullName: user?.fullName || '',
         email: user?.email || '',
-        phone: '0912 345 678', // Mock data
-        bio: 'Senior Developer with a passion for clean code and UI design.',
-        language: 'vi',
+        phone: user?.phone || '',
+        bio: user?.bio || '',
+        language: i18n.language,
         notifications: {
             email: true,
             push: false,
@@ -35,19 +38,58 @@ export default function ProfilePage() {
         }
     });
 
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+
+    const handleChangePassword = async () => {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            alert(t('profile.security.password_mismatch'));
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            await authAPI.changePassword(passwordData);
+            setSuccessMessage(t('profile.security.password_success'));
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            setTimeout(() => setSuccessMessage(''), 3000);
+        } catch (error) {
+            console.error(error);
+            alert(t('common.error') + ': ' + (error.response?.data?.message || t('profile.security.error_password')));
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleSave = async () => {
-        setIsLoading(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        setSuccessMessage('Đã cập nhật thông tin thành công!');
-        setTimeout(() => setSuccessMessage(''), 3000);
+        try {
+            setIsLoading(true);
+            const response = await authAPI.updateProfile({
+                fullName: formData.fullName,
+                phone: formData.phone,
+                bio: formData.bio
+            });
+
+            // Update context
+            updateUser(response.data.data);
+
+            setSuccessMessage(t('profile.save_success'));
+            setTimeout(() => setSuccessMessage(''), 3000);
+        } catch (error) {
+            console.error(error);
+            alert(t('common.error') + ': ' + (error.response?.data?.message || error.message));
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const tabs = [
-        { id: 'general', label: 'Thông tin chung', icon: User },
-        { id: 'security', label: 'Bảo mật', icon: Shield },
-        { id: 'settings', label: 'Cài đặt', icon: Bell },
+        { id: 'general', label: t('profile.tabs.general'), icon: User },
+        { id: 'security', label: t('profile.tabs.security'), icon: Shield },
+        { id: 'settings', label: t('profile.tabs.settings'), icon: Bell },
     ];
 
     const getInitials = (name) => name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'U';
@@ -81,10 +123,10 @@ export default function ProfilePage() {
                             </h1>
                             <div className="flex items-center justify-center sm:justify-start gap-3 text-sm text-gray-500 dark:text-gray-400">
                                 <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold border border-blue-200 dark:border-blue-800">
-                                    {user?.role === 'ADMIN' ? 'Administrator' : 'User'}
+                                    {user?.role === 'ADMIN' ? t('profile.role_admin') : t('profile.role_user')}
                                 </span>
                                 <span>•</span>
-                                <span>Tham gia từ Tháng 1, 2026</span>
+                                <span>{t('profile.joined')} {new Date(user?.createdAt).toLocaleDateString()}</span>
                             </div>
                         </div>
 
@@ -100,7 +142,7 @@ export default function ProfilePage() {
                                 ) : (
                                     <Save className="w-5 h-5" />
                                 )}
-                                Lưu thay đổi
+                                {t('profile.save_changes')}
                             </button>
                         </div>
                     </div>
@@ -117,8 +159,8 @@ export default function ProfilePage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${activeTab === tab.id
-                                        ? 'bg-primary text-white shadow-md'
-                                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                                    ? 'bg-primary text-white shadow-md'
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
                                     }`}
                             >
                                 <tab.icon className="w-5 h-5" />
@@ -141,13 +183,13 @@ export default function ProfilePage() {
                     {activeTab === 'general' && (
                         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 animate-fade-in">
                             <div className="mb-6">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Thông tin cá nhân</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Cập nhật thông tin công khai của bạn.</p>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('profile.general.title')}</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t('profile.general.subtitle')}</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('profile.general.fullname')}</label>
                                     <div className="relative">
                                         <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                         <input
@@ -160,7 +202,20 @@ export default function ProfilePage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('profile.general.phone')}</label>
+                                    <div className="relative">
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('profile.general.email')}</label>
                                     <div className="relative">
                                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                         <input
@@ -173,14 +228,14 @@ export default function ProfilePage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('profile.general.bio')}</label>
                                     <textarea
                                         rows="4"
                                         value={formData.bio}
                                         onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                                         className="w-full p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none"
                                     />
-                                    <p className="text-xs text-right text-gray-400">Tối đa 500 ký tự</p>
+                                    <p className="text-xs text-right text-gray-400">{t('profile.general.bio_limit')}</p>
                                 </div>
                             </div>
                         </div>
@@ -191,45 +246,54 @@ export default function ProfilePage() {
                         <div className="space-y-6 animate-fade-in">
                             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6">
                                 <div className="mb-6">
-                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Đổi mật khẩu</h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Đảm bảo sử dụng mật khẩu mạnh để bảo vệ tài khoản.</p>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('profile.security.title')}</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('profile.security.subtitle')}</p>
                                 </div>
 
                                 <div className="max-w-md space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Mật khẩu hiện tại</label>
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('profile.security.current_password')}</label>
                                         <div className="relative">
                                             <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input type="password" className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                                            <input
+                                                type="password"
+                                                value={passwordData.currentPassword}
+                                                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                            />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Mật khẩu mới</label>
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('profile.security.new_password')}</label>
                                         <div className="relative">
                                             <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input type="password" className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                                            <input
+                                                type="password"
+                                                value={passwordData.newPassword}
+                                                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                            />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Xác nhận mật khẩu</label>
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('profile.security.confirm_password')}</label>
                                         <div className="relative">
                                             <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input type="password" className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                                            <input
+                                                type="password"
+                                                value={passwordData.confirmPassword}
+                                                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                            />
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6">
-                                <div className="flex items-start gap-4">
-                                    <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                                        <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Xác thực 2 yếu tố</h3>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Tăng cường bảo mật bằng cách yêu cầu mã xác thực khi đăng nhập.</p>
-                                        <button className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                                            Thiết lập 2FA
+                                    <div className="pt-4">
+                                        <button
+                                            onClick={handleChangePassword}
+                                            disabled={isLoading}
+                                            className="px-6 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-70"
+                                        >
+                                            {isLoading ? t('profile.security.processing') : t('profile.security.update_password')}
                                         </button>
                                     </div>
                                 </div>
@@ -242,14 +306,14 @@ export default function ProfilePage() {
                         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 animate-fade-in">
                             <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Thông báo</h3>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('profile.settings.notifications.title')}</h3>
                                     <div className="space-y-4">
                                         <label className="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                             <div className="flex items-center gap-3">
                                                 <Mail className="w-5 h-5 text-gray-500" />
                                                 <div>
-                                                    <p className="font-medium text-gray-900 dark:text-white">Email thông báo</p>
-                                                    <p className="text-xs text-gray-500">Nhận thông báo về giao dịch mới qua email</p>
+                                                    <p className="font-medium text-gray-900 dark:text-white">{t('profile.settings.notifications.email_title')}</p>
+                                                    <p className="text-xs text-gray-500">{t('profile.settings.notifications.email_desc')}</p>
                                                 </div>
                                             </div>
                                             <div className="relative inline-flex items-center cursor-pointer">
@@ -262,8 +326,8 @@ export default function ProfilePage() {
                                             <div className="flex items-center gap-3">
                                                 <Bell className="w-5 h-5 text-gray-500" />
                                                 <div>
-                                                    <p className="font-medium text-gray-900 dark:text-white">Thông báo đẩy</p>
-                                                    <p className="text-xs text-gray-500">Nhận thông báo trực tiếp trên trình duyệt</p>
+                                                    <p className="font-medium text-gray-900 dark:text-white">{t('profile.settings.notifications.push_title')}</p>
+                                                    <p className="text-xs text-gray-500">{t('profile.settings.notifications.push_desc')}</p>
                                                 </div>
                                             </div>
                                             <div className="relative inline-flex items-center cursor-pointer">
@@ -277,16 +341,17 @@ export default function ProfilePage() {
                                 <div className="h-px bg-gray-100 dark:bg-gray-800"></div>
 
                                 <div>
-                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Giao diện & Ngôn ngữ</h3>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('profile.settings.interface.title')}</h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <Globe className="w-5 h-5 text-gray-500" />
-                                                <span className="font-medium">Ngôn ngữ</span>
+                                                <span className="font-medium">{t('common.language')}</span>
                                             </div>
                                             <select
                                                 className="bg-transparent font-medium text-primary focus:outline-none cursor-pointer"
-                                                defaultValue="vi"
+                                                value={i18n.language}
+                                                onChange={(e) => i18n.changeLanguage(e.target.value)}
                                             >
                                                 <option value="vi">Tiếng Việt</option>
                                                 <option value="en">English</option>

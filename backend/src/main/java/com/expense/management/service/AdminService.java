@@ -144,26 +144,32 @@ public class AdminService {
     public com.expense.management.model.dto.SystemSettingsDto updateSystemSettings(
             com.expense.management.model.dto.SystemSettingsDto settings) {
         // General
-        saveSetting("general.siteName", settings.getGeneral().getSiteName());
-        saveSetting("general.siteDescription", settings.getGeneral().getSiteDescription());
-        saveSetting("general.timezone", settings.getGeneral().getTimezone());
-        saveSetting("general.language", settings.getGeneral().getLanguage());
-        saveSetting("general.currency", settings.getGeneral().getCurrency());
+        if (settings.getGeneral() != null) {
+            saveSetting("general.siteName", settings.getGeneral().getSiteName());
+            saveSetting("general.siteDescription", settings.getGeneral().getSiteDescription());
+            saveSetting("general.timezone", settings.getGeneral().getTimezone());
+            saveSetting("general.language", settings.getGeneral().getLanguage());
+            saveSetting("general.currency", settings.getGeneral().getCurrency());
+        }
 
         // Notification
-        saveSetting("notification.enableEmailNotifications",
-                String.valueOf(settings.getNotification().isEnableEmailNotifications()));
-        saveSetting("notification.enableBudgetAlerts",
-                String.valueOf(settings.getNotification().isEnableBudgetAlerts()));
-        saveSetting("notification.budgetAlertThreshold",
-                String.valueOf(settings.getNotification().getBudgetAlertThreshold()));
-        saveSetting("notification.enableTransactionNotifications",
-                String.valueOf(settings.getNotification().isEnableTransactionNotifications()));
+        if (settings.getNotification() != null) {
+            saveSetting("notification.enableEmailNotifications",
+                    String.valueOf(settings.getNotification().isEnableEmailNotifications()));
+            saveSetting("notification.enableBudgetAlerts",
+                    String.valueOf(settings.getNotification().isEnableBudgetAlerts()));
+            saveSetting("notification.budgetAlertThreshold",
+                    String.valueOf(settings.getNotification().getBudgetAlertThreshold()));
+            saveSetting("notification.enableTransactionNotifications",
+                    String.valueOf(settings.getNotification().isEnableTransactionNotifications()));
+        }
 
         // Database
-        saveSetting("database.autoBackup", String.valueOf(settings.getDatabase().isAutoBackup()));
-        saveSetting("database.backupFrequency", settings.getDatabase().getBackupFrequency());
-        saveSetting("database.retentionDays", String.valueOf(settings.getDatabase().getRetentionDays()));
+        if (settings.getDatabase() != null) {
+            saveSetting("database.autoBackup", String.valueOf(settings.getDatabase().isAutoBackup()));
+            saveSetting("database.backupFrequency", settings.getDatabase().getBackupFrequency());
+            saveSetting("database.retentionDays", String.valueOf(settings.getDatabase().getRetentionDays()));
+        }
 
         return settings;
     }

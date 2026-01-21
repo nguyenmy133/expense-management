@@ -2,8 +2,10 @@ import { Menu, User, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import DarkModeToggle from './DarkModeToggle';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function Header({ toggleMobileSidebar }) {
+    const { t } = useTranslation();
     const { user, signOut } = useAuth();
     const navigate = useNavigate();
 
@@ -68,11 +70,18 @@ export default function Header({ toggleMobileSidebar }) {
                         <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 transform opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right">
                             <div className="p-2">
                                 <button
+                                    onClick={() => navigate('/profile')}
+                                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors mb-1"
+                                >
+                                    <User className="w-4 h-4" />
+                                    {t('common.profile')}
+                                </button>
+                                <button
                                     onClick={handleLogout}
                                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                 >
                                     <LogOut className="w-4 h-4" />
-                                    Sign Out
+                                    {t('common.logout')}
                                 </button>
                             </div>
                         </div>

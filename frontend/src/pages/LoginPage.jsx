@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Wallet, Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function LoginPage() {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ export default function LoginPage() {
             await signIn(email, password);
             navigate('/dashboard');
         } catch (err) {
-            setError(err.message || 'Đăng nhập thất bại');
+            setError(err.message || t('common.error'));
         } finally {
             setLoading(false);
         }
@@ -36,9 +38,9 @@ export default function LoginPage() {
                         <Wallet className="w-9 h-9 text-white" />
                     </div>
                     <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                        Quản lý Chi tiêu
+                        {t('auth.login.title')}
                     </h1>
-                    <p className="text-gray-600 dark:text-gray-400">Đăng nhập để tiếp tục</p>
+                    <p className="text-gray-600 dark:text-gray-400">{t('auth.login.subtitle')}</p>
                 </div>
 
                 {/* Login Form */}
@@ -48,7 +50,7 @@ export default function LoginPage() {
                             <div className="flex items-start gap-3">
                                 <AlertCircle className="w-5 h-5 text-danger-600 dark:text-danger-400 flex-shrink-0 mt-0.5" />
                                 <div>
-                                    <p className="font-medium text-danger-800 dark:text-danger-300">Lỗi</p>
+                                    <p className="font-medium text-danger-800 dark:text-danger-300">{t('auth.login.error_title')}</p>
                                     <p className="text-sm text-danger-700 dark:text-danger-400">{error}</p>
                                 </div>
                             </div>
@@ -58,7 +60,7 @@ export default function LoginPage() {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Email
+                                {t('auth.register.email')}
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -69,7 +71,7 @@ export default function LoginPage() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="input-field pl-10"
-                                    placeholder="your@email.com"
+                                    placeholder={t('auth.register.email_placeholder')}
                                     required
                                 />
                             </div>
@@ -77,7 +79,7 @@ export default function LoginPage() {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Mật khẩu
+                                {t('auth.register.password')}
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -102,22 +104,22 @@ export default function LoginPage() {
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">
                                     <Loader2 className="w-5 h-5 animate-spin" />
-                                    Đang đăng nhập...
+                                    {t('auth.login.loading')}
                                 </span>
                             ) : (
-                                'Đăng nhập'
+                                t('auth.login.submit')
                             )}
                         </button>
                     </form>
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Chưa có tài khoản?{' '}
+                            {t('auth.login.no_account')}{' '}
                             <Link
                                 to="/register"
                                 className="text-primary hover:text-primary-700 dark:hover:text-primary-400 font-medium hover:underline transition-colors"
                             >
-                                Đăng ký ngay
+                                {t('auth.login.register_now')}
                             </Link>
                         </p>
                     </div>
@@ -125,7 +127,7 @@ export default function LoginPage() {
 
                 {/* Footer */}
                 <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
-                    © 2024 Expense Management. All rights reserved.
+                    {t('auth.footer')}
                 </p>
             </div>
         </div>

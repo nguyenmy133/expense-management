@@ -1,0 +1,344 @@
+{
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "dashboard_desc": "Overview",
+        "transactions": "Transactions",
+        "transactions_desc": "Income & Expense",
+        "budgets": "Budgets",
+        "budgets_desc": "Planning",
+        "reports": "Reports",
+        "reports_desc": "Statistics",
+        "ai_assistant": "AI Assistant",
+        "ai_assistant_desc": "Financial Advice",
+        "personal": "Personal",
+        "admin": {
+            "title": "Administration",
+            "categories": "Categories",
+            "categories_desc": "Manage Categories",
+            "users": "User Management",
+            "users_desc": "Manage Users",
+            "settings": "System Settings",
+            "settings_desc": "Configuration"
+        }
+    },
+    "common": {
+        "currency_symbol": "₫",
+        "profile": "Profile",
+        "logout": "Logout",
+        "language": "Language",
+        "save": "Save Changes",
+        "cancel": "Cancel",
+        "success": "Success",
+        "error": "Error",
+        "delete": "Delete",
+        "edit": "Edit",
+        "confirm_delete": "Are you sure you want to delete this item?",
+        "loading": "Loading data...",
+        "no_data": "No data found",
+        "add": "Add New"
+    },
+    "transactions": {
+        "title": "Transactions",
+        "subtitle": "Manage your income and expenses",
+        "add_button": "Add Transaction",
+        "search_placeholder": "Search notes...",
+        "filters": {
+            "all_categories": "All Categories",
+            "all_time": "All Time",
+            "today": "Today",
+            "this_week": "This Week",
+            "this_month": "This Month",
+            "last_month": "Last Month",
+            "custom": "Custom...",
+            "from_date": "From Date",
+            "to_date": "To Date"
+        },
+        "empty": {
+            "title": "No transactions found",
+            "subtitle": "Try changing filters or add a new transaction"
+        },
+        "modal": {
+            "create_title": "Add Transaction",
+            "edit_title": "Edit Transaction",
+            "view_title": "Transaction Details",
+            "type": "Type",
+            "expense": "Expense",
+            "income": "Income",
+            "category": "Category",
+            "select_category": "Select Category",
+            "amount": "Amount",
+            "date": "Date",
+            "note": "Note",
+            "note_placeholder": "Enter transaction note..."
+        },
+        "messages": {
+            "add_success": "Transaction added successfully!",
+            "update_success": "Transaction updated successfully!",
+            "delete_success": "Transaction deleted successfully!",
+            "save_error": "Failed to save transaction!",
+            "delete_error": "Failed to delete transaction!"
+        }
+    },
+    "budgets": {
+        "title": "Budgets",
+        "subtitle": "Plan and control your spending",
+        "add_button": "Add Budget",
+        "empty": {
+            "title": "No budgets found",
+            "subtitle": "Plan your spending to better manage finances!",
+            "create_first": "Create First Budget"
+        },
+        "card": {
+            "spent": "Spent",
+            "remaining": "Remaining",
+            "over_budget": "Over Budget",
+            "over_amount": "You spent over {{amount}}",
+            "adjust": "Adjust Budget",
+            "view_tx": "View Transactions"
+        },
+        "modal": {
+            "create_title": "Add Budget",
+            "edit_title": "Edit Budget",
+            "month": "Month",
+            "year": "Year"
+        }
+    },
+    "reports": {
+        "title": "Financial Reports",
+        "subtitle": "Overview of your income and expenses",
+        "summary": {
+            "total_income": "Total Income",
+            "total_expense": "Total Expense",
+            "balance": "Balance"
+        },
+        "charts": {
+            "distribution": "Expense Distribution",
+            "no_data": "No expense data",
+            "trend": "Expense Trend",
+            "day": "Day",
+            "expense": "Expense"
+        },
+        "list": {
+            "title": "Details by Category",
+            "empty": "No expense data this month"
+        },
+        "analysis": {
+            "title": "Analysis",
+            "good": "You are managing your finances well! Income exceeds expenses.",
+            "keep_up": "Keep up the good habit.",
+            "bad": "Your expenses are exceeding your income.",
+            "cut_down": "Consider cutting down on unnecessary expenses.",
+            "top_category": "Top spending category"
+        }
+    },
+    "chat": {
+        "title": "AI Assistant",
+        "subtitle": "Smart financial assistant",
+        "welcome": "Hello! 👋",
+        "welcome_message": "I am your AI financial assistant. Ask me anything!",
+        "input_placeholder": "Enter your question...",
+        "clear_history": "Clear History",
+        "confirm_clear": "Are you sure you want to clear chat history?",
+        "error_message": "Sorry, an error occurred. Please try again later.",
+        "questions": {
+            "save_money": "How to save money effectively?",
+            "budget_allocation": "How should I allocate my budget?",
+            "daily_expense": "How to manage daily expenses?",
+            "investment_advice": "Investment advice for beginners"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "Log In",
+            "subtitle": "Login to continue",
+            "submit": "Log In",
+            "loading": "Logging in...",
+            "no_account": "Don't have an account?",
+            "register_now": "Register now",
+            "error_title": "Error",
+            "success": "Login successful"
+        },
+        "register": {
+            "title": "Create Account",
+            "subtitle": "Start managing your expenses",
+            "submit": "Register",
+            "loading": "Registering...",
+            "have_account": "Already have an account?",
+            "login_now": "Login now",
+            "fullname": "Full Name",
+            "fullname_placeholder": "John Doe",
+            "email": "Email",
+            "email_placeholder": "your@email.com",
+            "password": "Password",
+            "password_placeholder": "••••••••",
+            "min_length": "Minimum 6 characters",
+            "success": "Registration successful"
+        },
+        "footer": "© 2024 Expense Management. All rights reserved."
+    },
+    "dashboard": {
+        "title": "Hello, {{name}}!",
+        "subtitle": "Your expense overview for {{month}}",
+        "time_range": {
+            "today": "Today",
+            "week": "This Week",
+            "month": "This Month"
+        },
+        "stats": {
+            "income": "Income",
+            "expense": "Expense",
+            "balance": "Balance"
+        },
+        "loading": "Loading data...",
+        "tip": {
+            "title": "Expense Management Tip",
+            "content": "Track every daily expense to better control your finances!"
+        }
+    },
+    "admin": {
+        "categories": {
+            "title": "Category Management",
+            "subtitle": "Manage income and expense categories",
+            "search_placeholder": "Search categories...",
+            "add_button": "Add Category",
+            "total": "Total Categories",
+            "income": "Income",
+            "expense": "Expense",
+            "empty": "No categories found",
+            "table": {
+                "icon": "Icon",
+                "name": "Category Name",
+                "type": "Type",
+                "actions": "Actions"
+            },
+            "modal": {
+                "create_title": "Add New Category",
+                "edit_title": "Edit Category",
+                "name": "Category Name",
+                "name_placeholder": "Enter category name...",
+                "type": "Type",
+                "icon": "Icon"
+            },
+            "messages": {
+                "save_success": "Category saved successfully!",
+                "delete_success": "Category deleted successfully!",
+                "error_save": "Error saving category",
+                "error_delete": "Error deleting category",
+                "confirm_delete": "Are you sure you want to delete this category?"
+            }
+        },
+        "users": {
+            "title": "User Management",
+            "subtitle": "Manage user accounts in the system",
+            "search_placeholder": "Search users...",
+            "add_button": "Add User",
+            "total": "Total Users",
+            "admins": "Admins",
+            "regular_users": "Regular Users",
+            "empty": "No users found",
+            "table": {
+                "name": "Full Name",
+                "email": "Email",
+                "role": "Role",
+                "created_at": "Created At",
+                "actions": "Actions"
+            },
+            "modal": {
+                "create_title": "Add New User",
+                "edit_title": "Edit User",
+                "name": "Full Name",
+                "name_placeholder": "Enter full name...",
+                "email": "Email",
+                "email_placeholder": "Enter email...",
+                "password": "Password",
+                "password_hint": "(leave blank if not changing)",
+                "password_placeholder": "Enter password...",
+                "role": "Role",
+                "role_user": "User",
+                "role_admin": "Admin"
+            },
+            "messages": {
+                "required_fields": "Please fill in all required fields",
+                "password_required": "Please enter password for new user",
+                "save_success": "User saved successfully!",
+                "delete_success": "User deleted successfully!",
+                "error_save": "Error saving user",
+                "error_delete": "Error deleting user",
+                "confirm_delete": "Are you sure you want to delete this user?"
+            }
+        },
+        "system": {
+            "title": "System Settings",
+            "subtitle": "Manage system configurations and parameters",
+            "save_button": "Save Changes",
+            "saving": "Saving...",
+            "saved_success": "Saved successfully!",
+            "general": {
+                "title": "General",
+                "description": "Basic information and localization",
+                "site_name": "Application Name",
+                "site_description": "Short Description",
+                "language": "Language",
+                "currency": "Currency"
+            },
+            "notifications": {
+                "title": "Notifications",
+                "description": "Customize communication channels and alerts",
+                "email_notifications": "Send Email Notifications",
+                "budget_alerts": "Budget Exceeded Alerts",
+                "threshold": "Alert Threshold (%)"
+            },
+            "messages": {
+                "error_save": "Error saving settings"
+            }
+        }
+    },
+    "profile": {
+        "title": "User Profile",
+        "role_admin": "Administrator",
+        "role_user": "User",
+        "joined": "Joined",
+        "save_changes": "Save Changes",
+        "saving": "Saving...",
+        "save_success": "Profile updated successfully!",
+        "error_save": "An error occurred while saving.",
+        "tabs": {
+            "general": "General Info",
+            "security": "Security",
+            "settings": "Settings"
+        },
+        "general": {
+            "title": "Profile Information",
+            "subtitle": "Update your public profile information.",
+            "fullname": "Full Name",
+            "phone": "Phone Number",
+            "email": "Email",
+            "bio": "Bio",
+            "bio_limit": "Max 500 characters"
+        },
+        "security": {
+            "title": "Change Password",
+            "subtitle": "Ensure you use a strong password to protect your account.",
+            "current_password": "Current Password",
+            "new_password": "New Password",
+            "confirm_password": "Confirm New Password",
+            "update_password": "Update Password",
+            "processing": "Processing...",
+            "password_mismatch": "New password and confirmation do not match",
+            "password_success": "Password changed successfully!",
+            "error_password": "Could not change password"
+        },
+        "settings": {
+            "notifications": {
+                "title": "Notifications",
+                "email_title": "Email Notifications",
+                "email_desc": "Receive notifications about new transactions via email",
+                "push_title": "Push Notifications",
+                "push_desc": "Receive notifications directly on your browser"
+            },
+            "interface": {
+                "title": "Interface & Language"
+            }
+        }
+    }
+}

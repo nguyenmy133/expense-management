@@ -1,7 +1,9 @@
 package com.expense.management.controller;
 
+import com.expense.management.model.dto.request.ChangePasswordRequest;
 import com.expense.management.model.dto.request.LoginRequest;
 import com.expense.management.model.dto.request.RegisterRequest;
+import com.expense.management.model.dto.request.UpdateProfileRequest;
 import com.expense.management.model.dto.response.ApiResponse;
 import com.expense.management.model.dto.response.AuthResponse;
 import com.expense.management.model.dto.response.UserResponse;
@@ -42,7 +44,43 @@ public class AuthController {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtTokenProvider.getUserIdFromToken(token);
 
+        if (userId == null) {
+            throw new com.expense.management.exception.UnauthorizedException("Invalid token");
+        }
+
         UserResponse response = authService.getCurrentUser(userId);
         return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", response));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> updateProfile(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody UpdateProfileRequest request) {
+
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtTokenProvider.getUserIdFromToken(token);
+
+        if (userId == null) {
+            throw new com.expense.management.exception.UnauthorizedException("Invalid token");
+        }
+
+        UserResponse response = authService.updateProfile(userId, request);
+        return ResponseEntity.ok(ApiResponse.success("Profile updated successfully", response));
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtTokenProvider.getUserIdFromToken(token);
+
+        if (userId == null) {
+            throw new com.expense.management.exception.UnauthorizedException("Invalid token");
+        }
+
+        authService.changePassword(userId, request);
+        return ResponseEntity.ok(ApiResponse.success("Change password successfully", null));
     }
 }

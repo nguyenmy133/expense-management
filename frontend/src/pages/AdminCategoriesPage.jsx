@@ -13,8 +13,10 @@ import {
     TrendingDown
 } from 'lucide-react';
 import { categoryAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminCategoriesPage() {
+    const { t } = useTranslation();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -91,21 +93,21 @@ export default function AdminCategoriesPage() {
             handleCloseModal();
         } catch (error) {
             console.error('Error saving category:', error);
-            alert('Lỗi khi lưu danh mục: ' + (error.response?.data?.message || error.message));
+            alert(t('admin.categories.messages.error_save') + ': ' + (error.response?.data?.message || error.message));
         } finally {
             setSaving(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (!confirm('Bạn có chắc chắn muốn xóa danh mục này?')) return;
+        if (!confirm(t('admin.categories.messages.confirm_delete'))) return;
 
         try {
             await categoryAPI.delete(id);
             await fetchCategories();
         } catch (error) {
             console.error('Error deleting category:', error);
-            alert('Lỗi khi xóa danh mục: ' + (error.response?.data?.message || error.message));
+            alert(t('admin.categories.messages.error_delete') + ': ' + (error.response?.data?.message || error.message));
         }
     };
 
@@ -127,10 +129,10 @@ export default function AdminCategoriesPage() {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                        Quản lý Danh mục
+                        {t('admin.categories.title')}
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400">
-                        Quản lý các danh mục thu chi trong hệ thống
+                        {t('admin.categories.subtitle')}
                     </p>
                 </div>
 
@@ -139,7 +141,7 @@ export default function AdminCategoriesPage() {
                     <div className="card-modern p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Tổng danh mục</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('admin.categories.total')}</p>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
                             </div>
                             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
@@ -151,7 +153,7 @@ export default function AdminCategoriesPage() {
                     <div className="card-modern p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Thu nhập</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('admin.categories.income')}</p>
                                 <p className="text-3xl font-bold text-success-600 dark:text-success-400">{stats.income}</p>
                             </div>
                             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
@@ -163,7 +165,7 @@ export default function AdminCategoriesPage() {
                     <div className="card-modern p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Chi tiêu</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('admin.categories.expense')}</p>
                                 <p className="text-3xl font-bold text-danger-600 dark:text-danger-400">{stats.expense}</p>
                             </div>
                             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center">
@@ -181,7 +183,7 @@ export default function AdminCategoriesPage() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Tìm kiếm danh mục..."
+                                placeholder={t('admin.categories.search_placeholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="input-modern pl-10 w-full"
@@ -195,9 +197,9 @@ export default function AdminCategoriesPage() {
                                 onChange={(e) => setFilterType(e.target.value)}
                                 className="input-modern min-w-[140px]"
                             >
-                                <option value="ALL">Tất cả</option>
-                                <option value="INCOME">Thu nhập</option>
-                                <option value="EXPENSE">Chi tiêu</option>
+                                <option value="ALL">{t('transactions.filters.all_categories')}</option>
+                                <option value="INCOME">{t('admin.categories.income')}</option>
+                                <option value="EXPENSE">{t('admin.categories.expense')}</option>
                             </select>
 
                             <button
@@ -205,7 +207,7 @@ export default function AdminCategoriesPage() {
                                 className="btn-primary flex items-center justify-center gap-2 whitespace-nowrap shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-0.5 transition-all duration-200"
                             >
                                 <Plus className="w-5 h-5" />
-                                <span>Thêm danh mục</span>
+                                <span>{t('admin.categories.add_button')}</span>
                             </button>
                         </div>
                     </div>
@@ -220,7 +222,7 @@ export default function AdminCategoriesPage() {
                     ) : filteredCategories.length === 0 ? (
                         <div className="text-center py-12">
                             <Tag className="w-16 h-16 text-gray-300 dark:text-gray-700 mx-auto mb-4" />
-                            <p className="text-gray-600 dark:text-gray-400">Không tìm thấy danh mục nào</p>
+                            <p className="text-gray-600 dark:text-gray-400">{t('admin.categories.empty')}</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
@@ -228,16 +230,16 @@ export default function AdminCategoriesPage() {
                                 <thead className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
                                     <tr>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                            Icon
+                                            {t('admin.categories.table.icon')}
                                         </th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                            Tên danh mục
+                                            {t('admin.categories.table.name')}
                                         </th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                            Loại
+                                            {t('admin.categories.table.type')}
                                         </th>
                                         <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                            Thao tác
+                                            {t('admin.categories.table.actions')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -260,12 +262,12 @@ export default function AdminCategoriesPage() {
                                                     {category.type === 'INCOME' ? (
                                                         <>
                                                             <TrendingUp className="w-3 h-3" />
-                                                            Thu nhập
+                                                            {t('admin.categories.income')}
                                                         </>
                                                     ) : (
                                                         <>
                                                             <TrendingDown className="w-3 h-3" />
-                                                            Chi tiêu
+                                                            {t('admin.categories.expense')}
                                                         </>
                                                     )}
                                                 </span>
@@ -275,14 +277,14 @@ export default function AdminCategoriesPage() {
                                                     <button
                                                         onClick={() => handleOpenModal(category)}
                                                         className="p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
-                                                        title="Chỉnh sửa"
+                                                        title={t('common.edit')}
                                                     >
                                                         <Edit2 className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(category.id)}
                                                         className="p-2 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/30 transition-colors"
-                                                        title="Xóa"
+                                                        title={t('common.delete')}
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
@@ -304,7 +306,7 @@ export default function AdminCategoriesPage() {
                         {/* Modal Header */}
                         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                                {editingCategory ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'}
+                                {editingCategory ? t('admin.categories.modal.edit_title') : t('admin.categories.modal.create_title')}
                             </h2>
                             <button
                                 onClick={handleCloseModal}
@@ -319,13 +321,13 @@ export default function AdminCategoriesPage() {
                             {/* Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Tên danh mục
+                                    {t('admin.categories.modal.name')}
                                 </label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="Nhập tên danh mục..."
+                                    placeholder={t('admin.categories.modal.name_placeholder')}
                                     className="input-modern w-full"
                                 />
                             </div>
@@ -333,22 +335,22 @@ export default function AdminCategoriesPage() {
                             {/* Type */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Loại
+                                    {t('admin.categories.modal.type')}
                                 </label>
                                 <select
                                     value={formData.type}
                                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                                     className="input-modern w-full"
                                 >
-                                    <option value="INCOME">Thu nhập</option>
-                                    <option value="EXPENSE">Chi tiêu</option>
+                                    <option value="INCOME">{t('admin.categories.income')}</option>
+                                    <option value="EXPENSE">{t('admin.categories.expense')}</option>
                                 </select>
                             </div>
 
                             {/* Icon */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Icon
+                                    {t('admin.categories.modal.icon')}
                                 </label>
                                 <div className="grid grid-cols-8 gap-2">
                                     {iconOptions.map((icon) => (
@@ -375,7 +377,7 @@ export default function AdminCategoriesPage() {
                                 className="btn-secondary"
                                 disabled={saving}
                             >
-                                Hủy
+                                {t('common.cancel')}
                             </button>
                             <button
                                 onClick={handleSave}
@@ -390,7 +392,7 @@ export default function AdminCategoriesPage() {
                                 ) : (
                                     <>
                                         <Save className="w-4 h-4" />
-                                        Lưu
+                                        {t('common.save')}
                                     </>
                                 )}
                             </button>

@@ -1,8 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { chatAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 export default function ChatPage() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
@@ -56,7 +58,7 @@ export default function ChatPage() {
             console.error('Failed to send message:', error);
             const errorMessage = {
                 role: 'assistant',
-                content: 'Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.',
+                content: t('chat.error_message'),
                 timestamp: new Date().toISOString()
             };
             setMessages(prev => [...prev, errorMessage]);
@@ -66,7 +68,7 @@ export default function ChatPage() {
     };
 
     const handleClearHistory = async () => {
-        if (!window.confirm('Bạn có chắc muốn xóa toàn bộ lịch sử chat?')) return;
+        if (!window.confirm(t('chat.confirm_clear'))) return;
         try {
             await chatAPI.clearHistory();
             setMessages([]);
@@ -76,10 +78,10 @@ export default function ChatPage() {
     };
 
     const suggestedQuestions = [
-        'Làm sao để tiết kiệm hiệu quả?',
-        'Tôi nên phân bổ ngân sách như thế nào?',
-        'Cách quản lý chi tiêu hàng ngày?',
-        'Lời khuyên về đầu tư cho người mới'
+        t('chat.questions.save_money'),
+        t('chat.questions.budget_allocation'),
+        t('chat.questions.daily_expense'),
+        t('chat.questions.investment_advice')
     ];
 
     return (
@@ -90,13 +92,13 @@ export default function ChatPage() {
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-4">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">AI Chatbot</h1>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Trợ lý tài chính thông minh</p>
+                                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('chat.title')}</h1>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">{t('chat.subtitle')}</p>
                             </div>
                         </div>
                         {messages.length > 0 && (
                             <button onClick={handleClearHistory} className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors">
-                                Xóa lịch sử
+                                {t('chat.clear_history')}
                             </button>
                         )}
                     </div>
@@ -113,8 +115,8 @@ export default function ChatPage() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                                 </svg>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Xin chào! 👋</h3>
-                            <p className="text-gray-600 dark:text-gray-400 mb-6">Tôi là trợ lý tài chính AI. Hãy hỏi tôi bất cứ điều gì!</p>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('chat.welcome')}</h3>
+                            <p className="text-gray-600 dark:text-gray-400 mb-6">{t('chat.welcome_message')}</p>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
                                 {suggestedQuestions.map((question, index) => (
@@ -177,7 +179,7 @@ export default function ChatPage() {
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="Nhập câu hỏi của bạn..."
+                            placeholder={t('chat.input_placeholder')}
                             className="flex-1 px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-[#079DD9] focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
                             disabled={loading}
                         />

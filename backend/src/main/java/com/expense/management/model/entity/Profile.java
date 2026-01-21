@@ -37,6 +37,12 @@ public class Profile {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "bio", length = 500)
+    private String bio;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default

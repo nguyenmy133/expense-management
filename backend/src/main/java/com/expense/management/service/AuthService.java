@@ -1,9 +1,12 @@
 package com.expense.management.service;
 
 import com.expense.management.exception.BadRequestException;
+import com.expense.management.exception.ResourceNotFoundException;
 import com.expense.management.exception.UnauthorizedException;
+import com.expense.management.model.dto.request.ChangePasswordRequest;
 import com.expense.management.model.dto.request.LoginRequest;
 import com.expense.management.model.dto.request.RegisterRequest;
+import com.expense.management.model.dto.request.UpdateProfileRequest;
 import com.expense.management.model.dto.response.AuthResponse;
 import com.expense.management.model.dto.response.UserResponse;
 import com.expense.management.model.entity.Profile;
@@ -39,6 +42,10 @@ public class AuthService {
                                 .fullName(request.getFullName())
                                 .role(Role.USER)
                                 .build();
+
+                // Ensure profile is not null before saving (satisfies strict null analysis)
+                if (profile == null)
+                        throw new IllegalStateException("Profile builder returned null");
 
                 Profile savedProfile = profileRepository.save(profile);
 
@@ -84,11 +91,50 @@ public class AuthService {
         }
 
         @Transactional(readOnly = true)
-        public UserResponse getCurrentUser(Long userId) {
+        public UserResponse getCurrentUser(@org.springframework.lang.NonNull Long userId) {
                 Profile profile = profileRepository.findById(userId)
                                 .orElseThrow(() -> new UnauthorizedException("User not found"));
 
                 return mapToUserResponse(profile);
+        }
+
+        @Transactional
+        public UserResponse updateProfile(@org.springframework.lang.NonNull Long userId, UpdateProfileRequest request) {
+                Profile profile = profileRepository.findById(userId)
+                                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+                if (request.getFullName() != null) {
+                        profile.setFullName(request.getFullName());
+                }
+                if (request.getPhone() != null) {
+                        profile.setPhone(request.getPhone());
+                }
+                if (request.getBio() != null) {
+                        profile.setBio(request.getBio());
+                }
+                if (request.getAvatarUrl() != null) {
+                        profile.setAvatarUrl(request.getAvatarUrl());
+                }
+
+                Profile savedProfile = profileRepository.save(profile);
+                return mapToUserResponse(savedProfile);
+        }
+
+        @Transactional
+        public void changePassword(@org.springframework.lang.NonNull Long userId, ChangePasswordRequest request) {
+                if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                        throw new BadRequestException("New password and confirmation password do not match");
+                }
+
+                Profile profile = profileRepository.findById(userId)
+                                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+                if (!passwordEncoder.matches(request.getCurrentPassword(), profile.getPassword())) {
+                        throw new BadRequestException("Current password is incorrect");
+                }
+
+                profile.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                profileRepository.save(profile);
         }
 
         private UserResponse mapToUserResponse(Profile profile) {
@@ -97,6 +143,8 @@ public class AuthService {
                                 .email(profile.getEmail())
                                 .fullName(profile.getFullName())
                                 .avatarUrl(profile.getAvatarUrl())
+                                .phone(profile.getPhone())
+                                .bio(profile.getBio())
                                 .role(profile.getRole().name())
                                 .createdAt(profile.getCreatedAt())
                                 .build();

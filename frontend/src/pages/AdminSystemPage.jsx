@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
     Settings,
-    Database,
     Mail,
     Bell,
     Shield,
@@ -9,13 +8,13 @@ import {
     Save,
     Loader2,
     Check,
-    Server,
-    Key,
-    RefreshCw
+    Key
 } from 'lucide-react';
 import { useSystemSettings } from '../contexts/SystemSettingsContext';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminSystemPage() {
+    const { t } = useTranslation();
     const { settings, updateSystemSettings, loading: contextLoading } = useSystemSettings();
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -36,11 +35,6 @@ export default function AdminSystemPage() {
     });
 
 
-    const [databaseSettings, setDatabaseSettings] = useState({
-        autoBackup: true,
-        backupFrequency: 'daily',
-        retentionDays: 30
-    });
 
     // Populate local state from context when settings change
     useEffect(() => {
@@ -50,7 +44,7 @@ export default function AdminSystemPage() {
             console.log("Setting notification settings:", settings.notification);
             setNotificationSettings(prev => ({ ...prev, ...settings.notification }));
         }
-        if (settings.database) setDatabaseSettings(prev => ({ ...prev, ...settings.database }));
+
     }, [settings]);
 
     const handleSave = async () => {
@@ -59,8 +53,7 @@ export default function AdminSystemPage() {
 
             const settingsData = {
                 general: generalSettings,
-                notification: notificationSettings,
-                database: databaseSettings
+                notification: notificationSettings
             };
 
             console.log("Saving settings payload:", settingsData);
@@ -72,7 +65,7 @@ export default function AdminSystemPage() {
         } catch (error) {
             console.error('Error saving settings:', error);
             const message = error.response?.data?.message || error.message;
-            alert('Lỗi khi lưu cài đặt: ' + message);
+            alert(t('admin.system.messages.error_save') + ': ' + message);
         } finally {
             setSaving(false);
         }
@@ -116,10 +109,10 @@ export default function AdminSystemPage() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
-                            Cài đặt Hệ thống
+                            {t('admin.system.title')}
                         </h1>
                         <p className="mt-2 text-gray-600 dark:text-gray-400">
-                            Quản lý toàn bộ cấu hình và tham số vận hành của hệ thống
+                            {t('admin.system.subtitle')}
                         </p>
                     </div>
                     <button
@@ -137,17 +130,17 @@ export default function AdminSystemPage() {
                         {saving ? (
                             <>
                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                <span>Đang lưu...</span>
+                                <span>{t('admin.system.saving')}</span>
                             </>
                         ) : saved ? (
                             <>
                                 <Check className="w-5 h-5" />
-                                <span>Đã lưu thành công!</span>
+                                <span>{t('admin.system.saved_success')}</span>
                             </>
                         ) : (
                             <>
                                 <Save className="w-5 h-5" />
-                                <span>Lưu thay đổi</span>
+                                <span>{t('admin.system.save_button')}</span>
                             </>
                         )}
                     </button>
@@ -158,15 +151,15 @@ export default function AdminSystemPage() {
                     <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/20 overflow-hidden border border-gray-100 dark:border-gray-800 transition-all hover:border-primary/20 dark:hover:border-primary/20">
                         <SectionHeader
                             icon={Globe}
-                            title="Tổng quan"
-                            description="Thông tin cơ bản và bản địa hóa"
+                            title={t('admin.system.general.title')}
+                            description={t('admin.system.general.description')}
                             gradient="bg-gradient-to-br from-purple-500 to-indigo-600"
                         />
                         <div className="p-6 space-y-6">
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                        Tên ứng dụng
+                                        {t('admin.system.general.site_name')}
                                     </label>
                                     <input
                                         type="text"
@@ -177,7 +170,7 @@ export default function AdminSystemPage() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                        Mô tả ngắn
+                                        {t('admin.system.general.site_description')}
                                     </label>
                                     <textarea
                                         value={generalSettings.siteDescription}
@@ -189,7 +182,7 @@ export default function AdminSystemPage() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                            Ngôn ngữ
+                                            {t('admin.system.general.language')}
                                         </label>
                                         <select
                                             value={generalSettings.language}
@@ -202,7 +195,7 @@ export default function AdminSystemPage() {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                            Tiền tệ
+                                            {t('admin.system.general.currency')}
                                         </label>
                                         <select
                                             value={generalSettings.currency}
@@ -223,20 +216,20 @@ export default function AdminSystemPage() {
                     <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/20 overflow-hidden border border-gray-100 dark:border-gray-800 transition-all hover:border-primary/20 dark:hover:border-primary/20">
                         <SectionHeader
                             icon={Bell}
-                            title="Thông báo"
-                            description="Tùy chỉnh các kênh liên lạc và cảnh báo"
+                            title={t('admin.system.notifications.title')}
+                            description={t('admin.system.notifications.description')}
                             gradient="bg-gradient-to-br from-orange-400 to-pink-500"
                         />
                         <div className="p-6 space-y-4">
                             <ToggleSwitch
-                                label="Gửi thông báo qua Email"
+                                label={t('admin.system.notifications.email_notifications')}
                                 checked={notificationSettings.enableEmailNotifications}
                                 onChange={(val) => setNotificationSettings({ ...notificationSettings, enableEmailNotifications: val })}
                             />
 
                             <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Cảnh báo vượt ngân sách</span>
+                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.system.notifications.budget_alerts')}</span>
                                     <div className="relative inline-flex items-center cursor-pointer">
                                         <input
                                             type="checkbox"
@@ -250,7 +243,7 @@ export default function AdminSystemPage() {
                                 {notificationSettings.enableBudgetAlerts && (
                                     <div className="animate-fade-in pl-4 border-l-2 border-primary/20">
                                         <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-                                            Ngưỡng cảnh báo (%)
+                                            {t('admin.system.notifications.threshold')}
                                         </label>
                                         <div className="flex items-center gap-3">
                                             <input
@@ -274,67 +267,6 @@ export default function AdminSystemPage() {
                     </div>
 
 
-                    {/* Database Settings */}
-                    <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/20 overflow-hidden border border-gray-100 dark:border-gray-800 transition-all hover:border-primary/20 dark:hover:border-primary/20">
-                        <SectionHeader
-                            icon={Database}
-                            title="Dữ liệu & Backup"
-                            description="Quản lý sao lưu và vòng đời dữ liệu"
-                            gradient="bg-gradient-to-br from-green-400 to-emerald-600"
-                        />
-                        <div className="p-6 space-y-6">
-                            <ToggleSwitch
-                                label="Tự động sao lưu định kỳ"
-                                checked={databaseSettings.autoBackup}
-                                onChange={(val) => setDatabaseSettings({ ...databaseSettings, autoBackup: val })}
-                            />
-
-                            {databaseSettings.autoBackup && (
-                                <div className="grid grid-cols-2 gap-4 animate-fade-in">
-                                    <div>
-                                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-                                            Tần suất
-                                        </label>
-                                        <select
-                                            value={databaseSettings.backupFrequency}
-                                            onChange={(e) => setDatabaseSettings({ ...databaseSettings, backupFrequency: e.target.value })}
-                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
-                                        >
-                                            <option value="daily">Hàng ngày</option>
-                                            <option value="weekly">Hàng tuần</option>
-                                            <option value="monthly">Hàng tháng</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-                                            Lưu trữ (ngày)
-                                        </label>
-                                        <input
-                                            type="number"
-                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/50 font-bold text-gray-900 dark:text-white"
-                                            value={databaseSettings.retentionDays}
-                                            onChange={(e) => setDatabaseSettings({ ...databaseSettings, retentionDays: parseInt(e.target.value) })}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 flex items-start gap-4">
-                                <div className="p-2 bg-blue-100 dark:bg-blue-800 rounded-lg">
-                                    <Server className="w-5 h-5 text-blue-600 dark:text-blue-300" />
-                                </div>
-                                <div>
-                                    <h4 className="font-semibold text-blue-900 dark:text-blue-200 text-sm">Trạng thái Backup</h4>
-                                    <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
-                                        Lần backup cuối: <span className="font-mono font-bold">Today, 04:00 AM</span>
-                                    </p>
-                                    <button className="mt-2 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-                                        <RefreshCw className="w-3 h-3" /> Backup ngay
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

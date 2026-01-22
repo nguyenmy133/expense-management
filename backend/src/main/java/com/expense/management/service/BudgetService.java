@@ -59,6 +59,44 @@ public class BudgetService {
     }
 
     @Transactional
+    public BudgetResponse updateBudget(Long userId, Long budgetId, BudgetRequest request) {
+        Budget budget = getBudget(budgetId);
+        Profile user = getProfile(userId);
+
+        if (!budget.getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("You don't have permission to update this budget");
+        }
+
+        Long newCategoryId = request.getCategoryId();
+        Long oldCategoryId = budget.getCategory() != null ? budget.getCategory().getId() : null;
+
+        boolean isKeyChanged = (newCategoryId == null && oldCategoryId != null) ||
+                (newCategoryId != null && !newCategoryId.equals(oldCategoryId)) ||
+                !request.getMonth().equals(budget.getMonth()) ||
+                !request.getYear().equals(budget.getYear());
+
+        if (isKeyChanged) {
+            if (budgetRepository.existsByUserAndCategoryIdAndMonthAndYear(
+                    user, request.getCategoryId(), request.getMonth(), request.getYear())) {
+                throw new BadRequestException("Budget already exists for this category and period");
+            }
+        }
+
+        Category category = null;
+        if (request.getCategoryId() != null) {
+            category = getCategory(request.getCategoryId());
+        }
+
+        budget.setCategory(category);
+        budget.setAmount(request.getAmount());
+        budget.setMonth(request.getMonth());
+        budget.setYear(request.getYear());
+
+        Budget saved = budgetRepository.save(budget);
+        return mapToResponse(saved, user);
+    }
+
+    @Transactional
     public void deleteBudget(Long userId, Long budgetId) {
         Budget budget = getBudget(budgetId);
 

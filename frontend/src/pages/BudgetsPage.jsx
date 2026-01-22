@@ -293,7 +293,7 @@ export default function BudgetsPage() {
                                     placeholder="0"
                                     required
                                     min="0"
-                                    step="10000"
+                                    step="1"
                                 />
                             </div>
 

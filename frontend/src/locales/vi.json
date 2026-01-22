@@ -174,7 +174,7 @@
             "min_length": "Tối thiểu 6 ký tự",
             "success": "Đăng ký thành công"
         },
-        "footer": "© 2024 Expense Management. All rights reserved."
+        "footer": "© 2026 Expense Management. All rights reserved."
     },
     "dashboard": {
         "title": "Xin chào, {{name}}!",

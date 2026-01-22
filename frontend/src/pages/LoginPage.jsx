@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Wallet, Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { useSystemSettings } from '../contexts/SystemSettingsContext';
 import { useTranslation } from 'react-i18next';
 
 export default function LoginPage() {
     const { t } = useTranslation();
+    const { settings } = useSystemSettings();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -40,7 +42,9 @@ export default function LoginPage() {
                     <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                         {t('auth.login.title')}
                     </h1>
-                    <p className="text-gray-600 dark:text-gray-400">{t('auth.login.subtitle')}</p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                        {settings.siteDescription || t('auth.login.subtitle')}
+                    </p>
                 </div>
 
                 {/* Login Form */}

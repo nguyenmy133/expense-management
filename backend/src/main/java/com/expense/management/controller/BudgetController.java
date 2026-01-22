@@ -34,6 +34,18 @@ public class BudgetController {
                 .body(ApiResponse.success("Budget created successfully", response));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<BudgetResponse>> updateBudget(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long id,
+            @Valid @RequestBody BudgetRequest request) {
+
+        Long userId = getUserIdFromToken(authHeader);
+        BudgetResponse response = budgetService.updateBudget(userId, id, request);
+
+        return ResponseEntity.ok(ApiResponse.success("Budget updated successfully", response));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteBudget(
             @RequestHeader("Authorization") String authHeader,

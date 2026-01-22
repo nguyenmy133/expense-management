@@ -76,12 +76,7 @@
             <scope>runtime</scope>
         </dependency>
         
-        <!-- OpenAI Java SDK -->
-        <dependency>
-            <groupId>com.theokanning.openai-gpt3-java</groupId>
-            <artifactId>service</artifactId>
-            <version>0.18.2</version>
-        </dependency>
+
         
         <!-- Lombok -->
         <dependency>

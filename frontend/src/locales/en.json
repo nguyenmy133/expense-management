@@ -174,7 +174,7 @@
             "min_length": "Minimum 6 characters",
             "success": "Registration successful"
         },
-        "footer": "© 2024 Expense Management. All rights reserved."
+        "footer": "© 2026 Expense Management. All rights reserved."
     },
     "dashboard": {
         "title": "Hello, {{name}}!",

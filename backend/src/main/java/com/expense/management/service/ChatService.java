@@ -28,6 +28,8 @@ public class ChatService {
     private final ProfileRepository profileRepository;
     private final TransactionRepository transactionRepository;
 
+    private final GeminiService geminiService;
+
     @Transactional
     public ChatResponse chat(Long userId, ChatRequest request) {
         Profile user = getProfile(userId);
@@ -35,8 +37,15 @@ public class ChatService {
         // Build context from user's financial data
         String context = buildFinancialContext(user);
 
-        // Generate AI response (simplified version - no actual OpenAI call)
-        String aiResponse = generateResponse(request.getMessage(), context);
+        // Generate AI response via Gemini
+        String fullPrompt = "Bạn là một trợ lý tài chính cá nhân thông minh, thân thiện. " +
+                "Dưới đây là dữ liệu tài chính hiện tại của người dùng:\n" + context + "\n\n" +
+                "Người dùng hỏi: \"" + request.getMessage() + "\"\n" +
+                "Hãy trả lời người dùng dựa trên dữ liệu trên. Nếu câu hỏi không liên quan đến tài chính, hãy trả lời bình thường. "
+                +
+                "Trả lời bằng tiếng Việt, ngắn gọn, súc tích và có tính khuyên nhủ.";
+
+        String aiResponse = geminiService.generateContent(fullPrompt);
 
         // Save chat history
         ChatHistory chatHistory = ChatHistory.builder()
@@ -79,34 +88,6 @@ public class ChatService {
                 currentMonth, currentYear,
                 monthlyIncome, monthlyExpense,
                 monthlyIncome.subtract(monthlyExpense));
-    }
-
-    private String generateResponse(String message, String context) {
-        // Simplified AI response - In production, this would call OpenAI API
-        String lowerMessage = message.toLowerCase();
-
-        if (lowerMessage.contains("chi tiêu") || lowerMessage.contains("expense")) {
-            return "Dựa trên dữ liệu của bạn, tôi thấy bạn nên cân nhắc giảm chi tiêu ở một số danh mục không cần thiết. "
-                    +
-                    "Hãy xem lại các khoản chi cho ăn uống và giải trí nhé!";
-        } else if (lowerMessage.contains("tiết kiệm") || lowerMessage.contains("save")) {
-            return "Để tiết kiệm hiệu quả, bạn nên:\n" +
-                    "1. Lập ngân sách cho từng danh mục\n" +
-                    "2. Theo dõi chi tiêu hàng ngày\n" +
-                    "3. Cắt giảm các khoản chi không cần thiết\n" +
-                    "4. Đặt mục tiêu tiết kiệm cụ thể";
-        } else if (lowerMessage.contains("ngân sách") || lowerMessage.contains("budget")) {
-            return "Tôi khuyên bạn nên phân bổ ngân sách theo quy tắc 50/30/20:\n" +
-                    "- 50% cho nhu cầu thiết yếu\n" +
-                    "- 30% cho mong muốn cá nhân\n" +
-                    "- 20% cho tiết kiệm và đầu tư";
-        } else {
-            return "Tôi là trợ lý tài chính AI. Tôi có thể giúp bạn:\n" +
-                    "- Phân tích chi tiêu\n" +
-                    "- Đưa ra lời khuyên tiết kiệm\n" +
-                    "- Tư vấn về ngân sách\n" +
-                    "Hãy hỏi tôi về chi tiêu, tiết kiệm hoặc ngân sách của bạn!";
-        }
     }
 
     private Profile getProfile(Long userId) {

@@ -179,35 +179,7 @@ export default function AdminSystemPage() {
                                         className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 dark:text-white placeholder-gray-400 transition-all font-medium resize-none"
                                     />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                            {t('admin.system.general.language')}
-                                        </label>
-                                        <select
-                                            value={generalSettings.language}
-                                            onChange={(e) => setGeneralSettings({ ...generalSettings, language: e.target.value })}
-                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
-                                        >
-                                            <option value="vi">🇻🇳 Tiếng Việt</option>
-                                            <option value="en">🇺🇸 English</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                            {t('admin.system.general.currency')}
-                                        </label>
-                                        <select
-                                            value={generalSettings.currency}
-                                            onChange={(e) => setGeneralSettings({ ...generalSettings, currency: e.target.value })}
-                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
-                                        >
-                                            <option value="VND">VND (₫)</option>
-                                            <option value="USD">USD ($)</option>
-                                            <option value="EUR">EUR (€)</option>
-                                        </select>
-                                    </div>
-                                </div>
+
                             </div>
                         </div>
                     </div>

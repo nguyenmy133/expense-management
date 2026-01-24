@@ -1,14 +1,18 @@
 package com.expense.management.service;
 
+import com.expense.management.exception.BadRequestException;
 import com.expense.management.exception.ResourceNotFoundException;
 import com.expense.management.model.dto.request.CategoryRequest;
 import com.expense.management.model.dto.response.CategoryResponse;
 import com.expense.management.model.entity.Category;
+import com.expense.management.repository.BudgetRepository;
 import com.expense.management.repository.CategoryRepository;
+import com.expense.management.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +21,8 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final TransactionRepository transactionRepository;
+    private final BudgetRepository budgetRepository;
 
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories() {
@@ -91,10 +97,21 @@ public class CategoryService {
 
     @Transactional
     public void deleteCategory(Long id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Category not found with id: " + id);
-        }
-        categoryRepository.deleteById(id);
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+
+        // 1. Collect all category IDs (self + descendants)
+        List<Long> categoryIds = new ArrayList<>();
+        collectCategoryIds(category, categoryIds);
+
+        // 2. Cascade Delete: Delete associated transactions first
+        transactionRepository.deleteByCategoryIdIn(categoryIds);
+
+        // 3. Cascade Delete: Delete associated budgets next
+        budgetRepository.deleteByCategoryIdIn(categoryIds);
+
+        // 4. Finally, delete the category
+        categoryRepository.delete(category);
     }
 
     private CategoryResponse mapToResponse(Category category) {
@@ -107,5 +124,14 @@ public class CategoryService {
                 .isDefault(category.getIsDefault())
                 .parentId(category.getParent() != null ? category.getParent().getId() : null)
                 .build();
+    }
+
+    private void collectCategoryIds(Category category, List<Long> ids) {
+        ids.add(category.getId());
+        if (category.getChildren() != null) {
+            for (Category child : category.getChildren()) {
+                collectCategoryIds(child, ids);
+            }
+        }
     }
 }

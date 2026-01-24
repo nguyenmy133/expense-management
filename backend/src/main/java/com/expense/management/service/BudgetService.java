@@ -134,10 +134,14 @@ public class BudgetService {
         BigDecimal spent = BigDecimal.ZERO;
 
         if (budget.getCategory() != null) {
-            spent = transactionRepository.sumByUserAndCategoryAndMonthAndYear(
+            Category category = budget.getCategory();
+            java.util.List<Long> categoryIds = new java.util.ArrayList<>();
+            collectCategoryIds(category, categoryIds);
+
+            spent = transactionRepository.sumByUserAndCategoryIdsAndMonthAndYear(
                     user,
                     Transaction.TransactionType.EXPENSE,
-                    budget.getCategory().getId(),
+                    categoryIds,
                     budget.getMonth(),
                     budget.getYear());
         }
@@ -158,5 +162,14 @@ public class BudgetService {
                 .remaining(remaining)
                 .percentage(percentage)
                 .build();
+    }
+
+    private void collectCategoryIds(Category category, List<Long> ids) {
+        ids.add(category.getId());
+        if (category.getChildren() != null) {
+            for (Category child : category.getChildren()) {
+                collectCategoryIds(child, ids);
+            }
+        }
     }
 }

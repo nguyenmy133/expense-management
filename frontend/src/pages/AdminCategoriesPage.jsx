@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     Plus,
     Search,
@@ -12,6 +12,7 @@ import {
     TrendingUp,
     TrendingDown,
     ChevronRight,
+    ChevronLeft,
     FolderOpen,
     LayoutGrid
 } from 'lucide-react';
@@ -36,6 +37,7 @@ export default function AdminCategoriesPage() {
 
     // UI State for Icon Selector
     const [activeIconTab, setActiveIconTab] = useState('Common');
+    const scrollContainerRef = useRef(null);
 
     // Categorized Icons
     const iconLibrary = {
@@ -182,6 +184,18 @@ export default function AdminCategoriesPage() {
         total: categories.length,
         income: categories.filter(c => c.type === 'INCOME').length,
         expense: categories.filter(c => c.type === 'EXPENSE').length
+    };
+
+    const scrollTabs = (direction) => {
+        if (scrollContainerRef.current) {
+            const { current } = scrollContainerRef;
+            const scrollAmount = 200;
+            if (direction === 'left') {
+                current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
     };
 
     return (
@@ -496,25 +510,49 @@ export default function AdminCategoriesPage() {
                                         Biểu tượng <span className="text-danger-500">*</span>
                                     </label>
                                     <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 h-[320px] flex flex-col">
-                                        {/* Icon Categories Tabs */}
-                                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mb-2 border-b border-gray-200 dark:border-gray-700">
-                                            {Object.keys(iconLibrary).map(key => (
-                                                <button
-                                                    key={key}
-                                                    type="button"
-                                                    onClick={() => setActiveIconTab(key)}
-                                                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${activeIconTab === key
-                                                        ? 'bg-primary text-white'
-                                                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100'
-                                                        }`}
-                                                >
-                                                    {t(`admin.categories.icon_categories.${key}`, { defaultValue: key })}
-                                                </button>
-                                            ))}
+                                        {/* Icon Categories Tabs with Scroll Controls */}
+                                        <div className="relative group mb-3">
+                                            {/* Left Scroller */}
+                                            <button
+                                                type="button"
+                                                onClick={() => scrollTabs('left')}
+                                                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-white shadow-md rounded-full text-gray-600 hover:text-primary hover:scale-110 transition-all opacity-0 group-hover:opacity-100 disabled:opacity-0 -ml-2 border border-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
+                                            >
+                                                <ChevronLeft className="w-4 h-4" />
+                                            </button>
+
+                                            {/* Scrollable Container */}
+                                            <div
+                                                ref={scrollContainerRef}
+                                                className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide px-1 snap-x"
+                                            >
+                                                {Object.keys(iconLibrary).map(key => (
+                                                    <button
+                                                        key={key}
+                                                        type="button"
+                                                        onClick={() => setActiveIconTab(key)}
+                                                        className={`snap-start px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-300 ${activeIconTab === key
+                                                            ? 'bg-primary text-white shadow-md shadow-primary/30 transform scale-105'
+                                                            : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-100 dark:border-gray-600'
+                                                            }`}
+                                                    >
+                                                        {t(`admin.categories.icon_categories.${key}`, { defaultValue: key })}
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            {/* Right Scroller */}
+                                            <button
+                                                type="button"
+                                                onClick={() => scrollTabs('right')}
+                                                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-white shadow-md rounded-full text-gray-600 hover:text-primary hover:scale-110 transition-all opacity-0 group-hover:opacity-100 -mr-2 border border-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
+                                            >
+                                                <ChevronRight className="w-4 h-4" />
+                                            </button>
                                         </div>
 
                                         {/* Icon Grid */}
-                                        <div className="flex-1 overflow-y-auto grid grid-cols-6 gap-2 content-start pr-1">
+                                        <div className="flex-1 overflow-y-auto grid grid-cols-6 gap-2 content-start pr-1 custom-scrollbar">
                                             {iconLibrary[activeIconTab].map((icon) => (
                                                 <button
                                                     key={icon}

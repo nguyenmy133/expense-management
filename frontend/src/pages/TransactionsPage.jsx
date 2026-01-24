@@ -60,6 +60,7 @@ export default function TransactionsPage() {
         amount: '',
         type: 'EXPENSE',
         transactionDate: new Date().toISOString().split('T')[0],
+        time: new Date().toTimeString().split(' ')[0].substring(0, 5),
         note: ''
     });
 
@@ -134,17 +135,23 @@ export default function TransactionsPage() {
     const loadData = async () => {
         setLoading(true);
         try {
-            // Build query params
-            const params = {
+            // Build base query params
+            const baseParams = {
                 page: 0,
                 size: 100,
-                sort: 'transactionDate,desc',
                 ...(filters.type !== 'ALL' && { type: filters.type }),
                 ...(filters.categoryId !== 'ALL' && { categoryId: filters.categoryId }),
                 ...(filters.startDate && { startDate: filters.startDate }),
                 ...(filters.endDate && { endDate: filters.endDate }),
                 ...(filters.search && { note: filters.search })
             };
+
+            // Use URLSearchParams to ensure arrays (like sort) are serialized correctly as repeated params (sort=...&sort=...)
+            // instead of axios default (sort[]=...) which Spring might not handle by default.
+            const params = new URLSearchParams(baseParams);
+            params.append('sort', 'transactionDate,desc');
+            params.append('sort', 'time,desc');
+            params.append('sort', 'createdAt,desc');
 
             const [txResponse, catResponse] = await Promise.all([
                 transactionAPI.getAll(params),
@@ -202,6 +209,7 @@ export default function TransactionsPage() {
             amount: '',
             type: preselectedType,
             transactionDate: new Date().toISOString().split('T')[0],
+            time: new Date().toTimeString().split(' ')[0].substring(0, 5),
             note: ''
         });
         setShowModal(true);
@@ -221,6 +229,7 @@ export default function TransactionsPage() {
             amount: selectedTx.amount,
             type: selectedTx.type,
             transactionDate: selectedTx.transactionDate.split('T')[0],
+            time: selectedTx.time ? selectedTx.time.substring(0, 5) : '00:00',
             note: selectedTx.note || ''
         });
     };
@@ -231,7 +240,8 @@ export default function TransactionsPage() {
             const payload = {
                 ...formData,
                 categoryId: parseInt(formData.categoryId),
-                amount: parseFloat(formData.amount)
+                amount: parseFloat(formData.amount),
+                time: formData.time ? formData.time + ':00' : null // Append seconds
             };
 
             if (modalMode === 'create') {
@@ -389,6 +399,7 @@ export default function TransactionsPage() {
                                             <Calendar className="w-3 h-3 text-gray-400" />
                                             <p className="text-xs text-gray-500 dark:text-gray-500">
                                                 {new Date(tx.transactionDate).toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                                {tx.time && ` • ${tx.time.substring(0, 5)}`}
                                             </p>
                                         </div>
                                     </div>
@@ -456,6 +467,7 @@ export default function TransactionsPage() {
                                             <p className="text-xs text-gray-500 uppercase font-semibold">{t('transactions.modal.date')}</p>
                                             <p className="text-gray-900 dark:text-white">
                                                 {new Date(selectedTx.transactionDate).toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                                                {selectedTx.time && ` lúc ${selectedTx.time.substring(0, 5)}`}
                                             </p>
                                         </div>
                                     </div>
@@ -611,8 +623,8 @@ export default function TransactionsPage() {
                                                                         >
                                                                             <div className="flex items-center gap-4">
                                                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${formData.categoryId == cat.id
-                                                                                        ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                                                                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                                                                                    ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                                                                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                                                                                     }`}>
                                                                                     {cat.icon}
                                                                                 </div>
@@ -658,8 +670,8 @@ export default function TransactionsPage() {
                                                                         >
                                                                             <div className="flex items-center gap-4">
                                                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${formData.categoryId == cat.id
-                                                                                        ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                                                                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                                                                                    ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                                                                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                                                                                     }`}>
                                                                                     {cat.icon}
                                                                                 </div>
@@ -697,13 +709,22 @@ export default function TransactionsPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('transactions.modal.date')}</label>
-                                    <input
-                                        type="date"
-                                        value={formData.transactionDate}
-                                        onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
-                                        className="input-field"
-                                        required
-                                    />
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="date"
+                                            value={formData.transactionDate}
+                                            onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
+                                            className="input-field flex-1"
+                                            required
+                                        />
+                                        <input
+                                            type="time"
+                                            value={formData.time}
+                                            onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                                            className="input-field w-32"
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
                                 <div>

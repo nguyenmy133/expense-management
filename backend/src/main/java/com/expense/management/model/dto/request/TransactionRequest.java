@@ -27,8 +27,11 @@ public class TransactionRequest {
     private Transaction.TransactionType type;
 
     @NotNull(message = "Transaction date is required")
+    @NotNull(message = "Transaction date is required")
     @PastOrPresent(message = "Transaction date cannot be in the future")
     private LocalDate transactionDate;
+
+    private java.time.LocalTime time;
 
     private String note;
 }

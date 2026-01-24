@@ -49,6 +49,9 @@ public class Transaction {
     @Column(name = "transaction_date", nullable = false)
     private LocalDate transactionDate;
 
+    @Column(name = "transaction_time")
+    private java.time.LocalTime time;
+
     @Column(columnDefinition = "TEXT")
     private String note;
 

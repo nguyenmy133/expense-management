@@ -68,7 +68,8 @@ public class TransactionController {
             @RequestParam(defaultValue = "20") int size) {
 
         Long userId = getUserIdFromToken(authHeader);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("transactionDate").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(
+                Sort.Direction.DESC, "transactionDate", "time", "createdAt"));
         Page<TransactionResponse> response = transactionService.getTransactions(userId, pageable);
 
         return ResponseEntity.ok(ApiResponse.success("Transactions retrieved successfully", response));

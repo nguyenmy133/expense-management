@@ -22,6 +22,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         Page<Transaction> findByUserAndTransactionDateBetween(
                         Profile user, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
+        java.util.List<Transaction> findByUserAndTransactionDateBetweenOrderByTransactionDateDesc(
+                        Profile user, LocalDate startDate, LocalDate endDate);
+
         @Query("SELECT t FROM Transaction t WHERE t.user = :user " +
                         "AND (:type IS NULL OR t.type = :type) " +
                         "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
@@ -57,6 +60,18 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                         @Param("month") int month,
                         @Param("year") int year);
 
+        @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
+                        "WHERE t.user = :user AND t.type = :type " +
+                        "AND t.category.id IN :categoryIds " +
+                        "AND EXTRACT(MONTH FROM t.transactionDate) = :month " +
+                        "AND EXTRACT(YEAR FROM t.transactionDate) = :year")
+        BigDecimal sumByUserAndCategoryIdsAndMonthAndYear(
+                        @Param("user") Profile user,
+                        @Param("type") Transaction.TransactionType type,
+                        @Param("categoryIds") java.util.List<Long> categoryIds,
+                        @Param("month") int month,
+                        @Param("year") int year);
+
         // New methods for Phase 1 dashboard features
         @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
                         "WHERE t.user = :user AND t.type = :type " +
@@ -70,4 +85,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         @Query("SELECT t FROM Transaction t WHERE t.user = :user " +
                         "ORDER BY t.transactionDate DESC, t.createdAt DESC")
         Page<Transaction> findRecentByUser(@Param("user") Profile user, Pageable pageable);
+
+        @Query("SELECT COUNT(t) > 0 FROM Transaction t WHERE t.category.id IN :categoryIds")
+        boolean existsByCategoryIdIn(@Param("categoryIds") java.util.List<Long> categoryIds);
+
+        void deleteByCategoryIdIn(java.util.List<Long> categoryIds);
 }

@@ -21,6 +21,7 @@ public class TransactionResponse {
     private BigDecimal amount;
     private Transaction.TransactionType type;
     private LocalDate transactionDate;
+    private java.time.LocalTime time;
     private String note;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -51,6 +51,7 @@ public class TransactionService {
                 .amount(request.getAmount())
                 .type(request.getType())
                 .transactionDate(request.getTransactionDate())
+                .time(request.getTime() != null ? request.getTime() : java.time.LocalTime.now())
                 .note(request.getNote())
                 .build();
 
@@ -87,6 +88,9 @@ public class TransactionService {
         transaction.setAmount(request.getAmount());
         transaction.setType(request.getType());
         transaction.setTransactionDate(request.getTransactionDate());
+        if (request.getTime() != null) {
+            transaction.setTime(request.getTime());
+        }
         transaction.setNote(request.getNote());
 
         Transaction updated = transactionRepository.save(transaction);
@@ -287,6 +291,7 @@ public class TransactionService {
                 .amount(transaction.getAmount())
                 .type(transaction.getType())
                 .transactionDate(transaction.getTransactionDate())
+                .time(transaction.getTime())
                 .note(transaction.getNote())
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())

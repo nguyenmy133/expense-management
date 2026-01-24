@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
 
 @Repository
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
@@ -18,4 +19,10 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
 
         boolean existsByUserAndCategoryIdAndMonthAndYear(
                         Profile user, Long categoryId, Integer month, Integer year);
+
+        @Query("SELECT COUNT(b) > 0 FROM Budget b WHERE b.category.id IN :categoryIds")
+        boolean existsByCategoryIdIn(
+                        @org.springframework.data.repository.query.Param("categoryIds") java.util.List<Long> categoryIds);
+
+        void deleteByCategoryIdIn(java.util.List<Long> categoryIds);
 }

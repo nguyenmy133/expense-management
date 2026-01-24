@@ -17,4 +17,6 @@ public class CategoryResponse {
     private String icon;
     private String color;
     private Boolean isDefault;
+    private Long parentId;
+    private java.util.List<CategoryResponse> children;
 }

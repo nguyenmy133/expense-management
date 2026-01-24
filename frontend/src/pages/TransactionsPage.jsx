@@ -14,7 +14,9 @@ import {
     Filter,
     Calendar,
     Edit2,
-    MoreVertical
+    MoreVertical,
+    ChevronRight,
+    ChevronLeft
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -46,6 +48,9 @@ export default function TransactionsPage() {
 
     // Modal State
     const [showModal, setShowModal] = useState(false);
+    const [showCategorySelector, setShowCategorySelector] = useState(false);
+    const [selectorView, setSelectorView] = useState('ROOT'); // 'ROOT' | 'SUB'
+    const [parentCategory, setParentCategory] = useState(null);
     const [modalMode, setModalMode] = useState('create'); // 'create', 'view', 'edit'
     const [selectedTx, setSelectedTx] = useState(null);
 
@@ -518,19 +523,159 @@ export default function TransactionsPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('transactions.modal.category')}</label>
-                                    <select
-                                        value={formData.categoryId}
-                                        onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                                        className="input-field"
-                                        required
+
+                                    {/* Custom Select Trigger */}
+                                    <div
+                                        onClick={() => setShowCategorySelector(true)}
+                                        className="input-field flex items-center justify-between cursor-pointer hover:border-primary transition-colors"
                                     >
-                                        <option value="">{t('transactions.modal.select_category')}</option>
-                                        {categories
-                                            .filter(cat => cat.type === formData.type)
-                                            .map(cat => (
-                                                <option key={cat.id} value={cat.id}>{cat.icon} {cat.name}</option>
-                                            ))}
-                                    </select>
+                                        {formData.categoryId ? (
+                                            (() => {
+                                                const selectedCat = categories.find(c => c.id == formData.categoryId);
+                                                return selectedCat ? (
+                                                    <span className="flex items-center gap-2">
+                                                        <span className="text-xl">{selectedCat.icon}</span>
+                                                        <span className="font-medium">{selectedCat.name}</span>
+                                                    </span>
+                                                ) : <span className="text-gray-400">{t('transactions.modal.select_category')}</span>;
+                                            })()
+                                        ) : (
+                                            <span className="text-gray-400">{t('transactions.modal.select_category')}</span>
+                                        )}
+                                        <div className="text-gray-400">
+                                            <ChevronRight className="w-5 h-5 rotate-90" />
+                                        </div>
+                                    </div>
+
+                                    {/* Category Selector Modal */}
+                                    {showCategorySelector && (
+                                        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 z-[60] flex items-end sm:items-center justify-center sm:p-4 animate-fade-in backdrop-blur-sm">
+                                            <div className="bg-white dark:bg-gray-900 w-full max-w-md h-[80vh] sm:h-[600px] rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col animate-slide-up sm:animate-scale-in overflow-hidden">
+                                                {/* Header */}
+                                                <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
+                                                    {selectorView === 'ROOT' ? (
+                                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                                                            {t('transactions.modal.select_category')}
+                                                        </h3>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => setSelectorView('ROOT')}
+                                                            className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+                                                        >
+                                                            <ChevronLeft className="w-5 h-5" />
+                                                            <span className="font-medium text-sm">Quay lại</span>
+                                                        </button>
+                                                    )}
+
+                                                    <button
+                                                        onClick={() => { setShowCategorySelector(false); setSelectorView('ROOT'); }}
+                                                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+                                                    >
+                                                        <X className="w-5 h-5 text-gray-500" />
+                                                    </button>
+                                                </div>
+
+                                                {/* Parent Name (if in sub view) */}
+                                                {selectorView === 'SUB' && parentCategory && (
+                                                    <div className="p-4 bg-gray-50 dark:bg-gray-800/50 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800">
+                                                        <span className="text-3xl">{parentCategory.icon}</span>
+                                                        <div>
+                                                            <p className="font-bold text-gray-900 dark:text-white text-lg">{parentCategory.name}</p>
+                                                            <p className="text-xs text-gray-500">Chọn danh mục con hoặc chính danh mục này</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* List */}
+                                                <div className="flex-1 overflow-y-auto p-2">
+                                                    <div className="grid grid-cols-1 gap-1">
+                                                        {selectorView === 'ROOT' ? (
+                                                            /* ROOT CATEGORIES */
+                                                            categories
+                                                                .filter(c => c.type === formData.type && !c.parentId)
+                                                                .map(cat => {
+                                                                    const hasChildren = categories.some(c => c.parentId === cat.id);
+                                                                    return (
+                                                                        <button
+                                                                            key={cat.id}
+                                                                            onClick={() => {
+                                                                                if (hasChildren) {
+                                                                                    setParentCategory(cat);
+                                                                                    setSelectorView('SUB');
+                                                                                } else {
+                                                                                    setFormData({ ...formData, categoryId: cat.id });
+                                                                                    setShowCategorySelector(false);
+                                                                                }
+                                                                            }}
+                                                                            className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all border border-transparent hover:border-gray-100 dark:hover:border-gray-700 group"
+                                                                        >
+                                                                            <div className="flex items-center gap-4">
+                                                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${formData.categoryId == cat.id
+                                                                                        ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                                                                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                                                                                    }`}>
+                                                                                    {cat.icon}
+                                                                                </div>
+                                                                                <span className={`font-medium ${formData.categoryId == cat.id ? 'text-primary' : 'text-gray-900 dark:text-white'}`}>
+                                                                                    {cat.name}
+                                                                                </span>
+                                                                            </div>
+                                                                            {hasChildren && <ChevronRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />}
+                                                                        </button>
+                                                                    );
+                                                                })
+                                                        ) : (
+                                                            /* SUB CATEGORIES */
+                                                            <>
+                                                                {/* Option to select Parent itself */}
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setFormData({ ...formData, categoryId: parentCategory.id });
+                                                                        setShowCategorySelector(false);
+                                                                        setSelectorView('ROOT');
+                                                                    }}
+                                                                    className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all border-l-4 border-transparent hover:border-l-primary"
+                                                                >
+                                                                    <div className="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-400">
+                                                                        <div className="w-2 h-2 rounded-full bg-current"></div>
+                                                                    </div>
+                                                                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                                                                        Chọn "{parentCategory.name}"
+                                                                    </span>
+                                                                </button>
+
+                                                                {categories
+                                                                    .filter(c => c.parentId === parentCategory.id)
+                                                                    .map(cat => (
+                                                                        <button
+                                                                            key={cat.id}
+                                                                            onClick={() => {
+                                                                                setFormData({ ...formData, categoryId: cat.id });
+                                                                                setShowCategorySelector(false);
+                                                                                setSelectorView('ROOT');
+                                                                            }}
+                                                                            className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all ml-4"
+                                                                        >
+                                                                            <div className="flex items-center gap-4">
+                                                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${formData.categoryId == cat.id
+                                                                                        ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                                                                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                                                                                    }`}>
+                                                                                    {cat.icon}
+                                                                                </div>
+                                                                                <span className={`font-medium ${formData.categoryId == cat.id ? 'text-primary' : 'text-gray-900 dark:text-white'}`}>
+                                                                                    {cat.name}
+                                                                                </span>
+                                                                            </div>
+                                                                        </button>
+                                                                    ))}
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>
@@ -544,7 +689,7 @@ export default function TransactionsPage() {
                                             placeholder="0"
                                             required
                                             min="0"
-                                            step="1000"
+                                            step="1"
                                         />
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">VNĐ</div>
                                     </div>

@@ -115,8 +115,10 @@
             "distribution": "Phân bổ chi tiêu",
             "no_data": "Chưa có dữ liệu chi tiêu",
             "trend": "Xu hướng chi tiêu trong tháng",
+            "trend_income": "Xu hướng thu nhập trong tháng",
             "day": "Ngày",
-            "expense": "Chi tiêu"
+            "expense": "Chi tiêu",
+            "income": "Thu nhập"
         },
         "list": {
             "title": "Chi tiết theo danh mục",
@@ -218,6 +220,16 @@
                 "name_placeholder": "Nhập tên danh mục...",
                 "type": "Loại",
                 "icon": "Icon"
+            },
+            "icon_categories": {
+                "Common": "Phổ biến",
+                "Food": "Ăn uống",
+                "Shopping": "Mua sắm",
+                "Transport": "Di chuyển",
+                "Entertainment": "Giải trí",
+                "Health": "Sức khỏe",
+                "Services": "Dịch vụ",
+                "Tech & Util": "Công nghệ & Tiện ích"
             },
             "messages": {
                 "save_success": "Lưu danh mục thành công!",

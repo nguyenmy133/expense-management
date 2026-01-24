@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { transactionAPI, budgetAPI } from '../services/api';
+import CalendarView from '../components/dashboard/CalendarView';
 import {
     Wallet,
     TrendingUp,
@@ -14,7 +15,9 @@ import {
     MessageSquare,
     LogOut,
     Loader2,
-    Sparkles
+    Sparkles,
+    Calendar,
+    List
 } from 'lucide-react';
 import DarkModeToggle from '../components/layout/DarkModeToggle';
 import StatCard from '../components/dashboard/StatCard';
@@ -34,6 +37,9 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState('month');
 
+    // View Mode State: 'list' or 'calendar'
+    const [viewMode, setViewMode] = useState('list');
+
     useEffect(() => {
         loadDashboardData();
     }, [timeRange]);
@@ -50,7 +56,8 @@ export default function DashboardPage() {
                 transactionAPI.getTrend({ month, year }),
                 transactionAPI.getRecent({ limit: 5 }),
                 budgetAPI.getAll({ month, year }),
-                transactionAPI.getAll({ page: 0, size: 100 }) // For budget calculation
+                // Increase limit to cover enough data for calendar (approx 3-4 months history)
+                transactionAPI.getAll({ page: 0, size: 300 })
             ]);
 
             setStats(statsRes.data.data);
@@ -70,6 +77,7 @@ export default function DashboardPage() {
     return (
         <div className="p-4 sm:p-6 lg:p-8">
             {/* Welcome & Filter Section */}
+            {/* ... (Keep existing code) ... */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 animate-fade-in">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
@@ -141,12 +149,46 @@ export default function DashboardPage() {
                         />
                     </div>
 
-                    {/* Recent Transactions Widget */}
+                    {/* Transaction Section with Toggle */}
                     <div className="mb-8">
-                        <RecentTransactions
-                            transactions={recentTransactions}
-                            loading={false}
-                        />
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                                {viewMode === 'list' ? 'Giao dịch gần đây' : 'Lịch giao dịch'}
+                            </h3>
+
+                            {/* Toggle Switch */}
+                            <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex items-center">
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'list'
+                                        ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                        }`}
+                                >
+                                    <List className="w-4 h-4" />
+                                    Danh sách
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('calendar')}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'calendar'
+                                        ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                        }`}
+                                >
+                                    <Calendar className="w-4 h-4" />
+                                    Lịch
+                                </button>
+                            </div>
+                        </div>
+
+                        {viewMode === 'list' ? (
+                            <RecentTransactions
+                                transactions={recentTransactions}
+                                loading={false}
+                            />
+                        ) : (
+                            <CalendarView transactions={allTransactions} />
+                        )}
                     </div>
 
                     {/* Budget Progress Widget */}

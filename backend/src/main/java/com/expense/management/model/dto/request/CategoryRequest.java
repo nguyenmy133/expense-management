@@ -14,4 +14,5 @@ public class CategoryRequest {
     private String name;
     private Category.CategoryType type;
     private String icon;
+    private Long parentId;
 }

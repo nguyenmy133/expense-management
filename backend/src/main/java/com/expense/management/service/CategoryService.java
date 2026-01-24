@@ -41,6 +41,19 @@ public class CategoryService {
                 .isDefault(false)
                 .build();
 
+        if (request.getParentId() != null) {
+            Category parent = categoryRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Parent category not found with id: " + request.getParentId()));
+
+            // Validate parent type
+            if (parent.getType() != request.getType()) {
+                throw new IllegalArgumentException(
+                        "Subcategory must be of the same type (INCOME/EXPENSE) as the parent");
+            }
+            category.setParent(parent);
+        }
+
         Category savedCategory = categoryRepository.save(category);
         return mapToResponse(savedCategory);
     }
@@ -53,6 +66,24 @@ public class CategoryService {
         category.setName(request.getName());
         category.setType(request.getType());
         category.setIcon(request.getIcon());
+
+        if (request.getParentId() != null) {
+            if (request.getParentId().equals(id)) {
+                throw new IllegalArgumentException("Category cannot be its own parent");
+            }
+            Category parent = categoryRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Parent category not found with id: " + request.getParentId()));
+
+            // Validate parent type
+            if (parent.getType() != request.getType()) {
+                throw new IllegalArgumentException(
+                        "Subcategory must be of the same type (INCOME/EXPENSE) as the parent");
+            }
+            category.setParent(parent);
+        } else {
+            category.setParent(null);
+        }
 
         Category updatedCategory = categoryRepository.save(category);
         return mapToResponse(updatedCategory);
@@ -74,6 +105,7 @@ public class CategoryService {
                 .icon(category.getIcon())
                 .color(category.getColor())
                 .isDefault(category.getIsDefault())
+                .parentId(category.getParent() != null ? category.getParent().getId() : null)
                 .build();
     }
 }

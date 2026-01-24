@@ -13,7 +13,9 @@ export default function ReportsPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [monthlyReport, setMonthlyReport] = useState(null);
-    const [dailyExpenses, setDailyExpenses] = useState([]); // State for Line Chart
+    const [dailyExpenses, setDailyExpenses] = useState([]); // State for Line Chart (Expense)
+    const [dailyIncome, setDailyIncome] = useState([]); // State for Line Chart (Income)
+    const [reportType, setReportType] = useState('EXPENSE'); // 'EXPENSE' | 'INCOME'
     const [loading, setLoading] = useState(true);
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -31,29 +33,26 @@ export default function ReportsPage() {
                 year: selectedYear
             });
 
-            // 2. Load Transactions for Line Chart (Daily Expense Trend)
-            // Calculate start and end date of the month
+            // 2. Load Transactions for Line Chart (Daily Trends)
             const startDate = new Date(selectedYear, selectedMonth - 1, 1);
             const endDate = new Date(selectedYear, selectedMonth, 0); // Last day of month
 
-            // Format dates for API (YYYY-MM-DD)
-            // Adjust for timezone to avoid off-by-one errors
             const formatDate = (date) => {
                 const offset = date.getTimezoneOffset() * 60000;
                 return new Date(date.getTime() - offset).toISOString().split('T')[0];
             };
 
+            // Fetch ALL transactions to calculate both Income and Expense trends
             const txPromise = transactionAPI.getAll({
                 startDate: formatDate(startDate),
                 endDate: formatDate(endDate),
-                type: 'EXPENSE', // Only interested in expenses for the chart
-                size: 1000 // Ensure we get most/all transactions
+                size: 1000
             });
 
             const [reportRes, txRes] = await Promise.all([reportPromise, txPromise]);
 
             setMonthlyReport(reportRes.data.data);
-            processDailyExpenses(txRes.data.data.content || [], startDate, endDate);
+            processDailyTransactions(txRes.data.data.content || [], startDate, endDate);
 
         } catch (error) {
             console.error('Failed to load report data:', error);
@@ -62,34 +61,40 @@ export default function ReportsPage() {
         }
     };
 
-    const processDailyExpenses = (transactions, startDate, endDate) => {
-        // Initialize an array for all days in the month
+    const processDailyTransactions = (transactions, startDate, endDate) => {
         const daysInMonth = endDate.getDate();
-        const dailyData = [];
+        const tempExpense = [];
+        const tempIncome = [];
 
-        // Create a map for quick lookup
         const expenseMap = {};
-        transactions.forEach(tx => {
-            // STRICT CLIENT-SIDE FILTER: Ensure we only sum EXPENSE transactions.
-            // Even if API is asked for EXPENSE, checking here prevents income mix-up.
-            if (tx.type !== 'EXPENSE') return;
+        const incomeMap = {};
 
+        transactions.forEach(tx => {
             const dateStr = tx.transactionDate.split('T')[0];
             const amount = Math.abs(tx.amount);
-            expenseMap[dateStr] = (expenseMap[dateStr] || 0) + amount;
+
+            if (tx.type === 'EXPENSE') {
+                expenseMap[dateStr] = (expenseMap[dateStr] || 0) + amount;
+            } else if (tx.type === 'INCOME') {
+                incomeMap[dateStr] = (incomeMap[dateStr] || 0) + amount;
+            }
         });
 
-        // Fill data for each day
         for (let i = 1; i <= daysInMonth; i++) {
             const day = new Date(selectedYear, selectedMonth - 1, i);
             const dateStr = new Date(day.getTime() - (day.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-            dailyData.push({
-                day: i, // distinct day number for X-axis
+
+            const dayData = {
+                day: i,
                 date: dateStr,
-                amount: expenseMap[dateStr] || 0
-            });
+            };
+
+            tempExpense.push({ ...dayData, amount: expenseMap[dateStr] || 0 });
+            tempIncome.push({ ...dayData, amount: incomeMap[dateStr] || 0 });
         }
-        setDailyExpenses(dailyData);
+
+        setDailyExpenses(tempExpense);
+        setDailyIncome(tempIncome);
     };
 
     const months = [
@@ -247,12 +252,39 @@ export default function ReportsPage() {
                                 )}
                             </div>
 
-                            {/* 2. LINE CHART: Expense by Day */}
+                            {/* 2. LINE CHART: Trends by Day */}
                             <div className="card min-h-[400px] flex flex-col">
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('reports.charts.trend')}</h3>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                        {reportType === 'EXPENSE' ? t('reports.charts.trend') : t('reports.charts.trend_income')}
+                                    </h3>
+
+                                    {/* Type Toggle */}
+                                    <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                                        <button
+                                            onClick={() => setReportType('EXPENSE')}
+                                            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${reportType === 'EXPENSE'
+                                                ? 'bg-white dark:bg-gray-700 text-danger-600 shadow-sm'
+                                                : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                                }`}
+                                        >
+                                            {t('reports.summary.total_expense')}
+                                        </button>
+                                        <button
+                                            onClick={() => setReportType('INCOME')}
+                                            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${reportType === 'INCOME'
+                                                ? 'bg-white dark:bg-gray-700 text-success-600 shadow-sm'
+                                                : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                                }`}
+                                        >
+                                            {t('reports.summary.total_income')}
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div className="flex-1">
                                     <ResponsiveContainer width="100%" height={300}>
-                                        <LineChart data={dailyExpenses} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                                        <LineChart data={reportType === 'EXPENSE' ? dailyExpenses : dailyIncome} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
                                             <XAxis
                                                 dataKey="day"
@@ -265,15 +297,18 @@ export default function ReportsPage() {
                                             />
                                             <Tooltip
                                                 labelFormatter={(day) => `${t('reports.charts.day')} ${day}`}
-                                                formatter={(value) => [new Intl.NumberFormat('vi-VN').format(value) + ` ${t('common.currency_symbol')}`, t('reports.charts.expense')]}
+                                                formatter={(value) => [
+                                                    new Intl.NumberFormat('vi-VN').format(value) + ` ${t('common.currency_symbol')}`,
+                                                    reportType === 'EXPENSE' ? t('reports.charts.expense') : t('reports.charts.income')
+                                                ]}
                                                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                             />
                                             <Line
                                                 type="monotone"
                                                 dataKey="amount"
-                                                stroke="#ef4444"
+                                                stroke={reportType === 'EXPENSE' ? '#ef4444' : '#10b981'} // Red for Expense, Green for Income
                                                 strokeWidth={2}
-                                                dot={{ r: 3, fill: '#ef4444' }}
+                                                dot={{ r: 3, fill: reportType === 'EXPENSE' ? '#ef4444' : '#10b981' }}
                                                 activeDot={{ r: 6 }}
                                             />
                                         </LineChart>

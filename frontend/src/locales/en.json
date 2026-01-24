@@ -115,8 +115,10 @@
             "distribution": "Expense Distribution",
             "no_data": "No expense data",
             "trend": "Expense Trend",
+            "trend_income": "Income Trend",
             "day": "Day",
-            "expense": "Expense"
+            "expense": "Expense",
+            "income": "Income"
         },
         "list": {
             "title": "Details by Category",
@@ -218,6 +220,16 @@
                 "name_placeholder": "Enter category name...",
                 "type": "Type",
                 "icon": "Icon"
+            },
+            "icon_categories": {
+                "Common": "Common",
+                "Food": "Food",
+                "Shopping": "Shopping",
+                "Transport": "Transport",
+                "Entertainment": "Entertainment",
+                "Health": "Health",
+                "Services": "Services",
+                "Tech & Util": "Tech & Util"
             },
             "messages": {
                 "save_success": "Category saved successfully!",

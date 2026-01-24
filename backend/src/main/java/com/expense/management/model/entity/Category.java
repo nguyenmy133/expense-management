@@ -47,6 +47,13 @@ public class Category {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Category parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    private java.util.List<Category> children;
+
     public enum CategoryType {
         INCOME, EXPENSE
     }

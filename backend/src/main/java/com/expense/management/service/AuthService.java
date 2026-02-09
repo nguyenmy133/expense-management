@@ -4,17 +4,21 @@ import com.expense.management.exception.BadRequestException;
 import com.expense.management.exception.ResourceNotFoundException;
 import com.expense.management.exception.UnauthorizedException;
 import com.expense.management.model.dto.request.ChangePasswordRequest;
+import com.expense.management.model.dto.request.ForgotPasswordRequest;
 import com.expense.management.model.dto.request.LoginRequest;
 import com.expense.management.model.dto.request.RegisterRequest;
+import com.expense.management.model.dto.request.ResetPasswordRequest;
 import com.expense.management.model.dto.request.UpdateProfileRequest;
 import com.expense.management.model.dto.response.AuthResponse;
 import com.expense.management.model.dto.response.UserResponse;
+import com.expense.management.model.entity.PasswordResetToken;
 import com.expense.management.model.entity.Profile;
 import com.expense.management.model.enums.Role;
 import com.expense.management.repository.ProfileRepository;
 import com.expense.management.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +31,11 @@ public class AuthService {
         private final ProfileRepository profileRepository;
         private final PasswordEncoder passwordEncoder;
         private final JwtTokenProvider jwtTokenProvider;
+        private final EmailService emailService;
+        private final com.expense.management.repository.PasswordResetTokenRepository passwordResetTokenRepository;
+
+        @Value("${google.client-id}")
+        private String googleClientId;
 
         @Transactional
         public AuthResponse register(RegisterRequest request) {
@@ -135,6 +144,149 @@ public class AuthService {
 
                 profile.setPassword(passwordEncoder.encode(request.getNewPassword()));
                 profileRepository.save(profile);
+        }
+
+        @Transactional
+        public void forgotPassword(ForgotPasswordRequest request) {
+                // Find user by email
+                Profile profile = profileRepository.findByEmail(request.getEmail())
+                                .orElseThrow(() -> new ResourceNotFoundException("No account found with this email"));
+
+                // Delete any existing reset tokens for this user
+                passwordResetTokenRepository.deleteByProfile(profile);
+
+                // Generate random token
+                String token = java.util.UUID.randomUUID().toString();
+
+                // Create password reset token (expires in 15 minutes)
+                PasswordResetToken resetToken = PasswordResetToken
+                                .builder()
+                                .token(token)
+                                .profile(profile)
+                                .expiryDate(java.time.LocalDateTime.now().plusMinutes(15))
+                                .build();
+
+                passwordResetTokenRepository.save(resetToken);
+
+                // Send email with reset link
+                emailService.sendPasswordResetEmail(profile.getEmail(), token, profile.getFullName());
+
+                log.info("Password reset email sent to: {}", profile.getEmail());
+        }
+
+        @Transactional
+        public void resetPassword(ResetPasswordRequest request) {
+                // Validate passwords match
+                if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                        throw new BadRequestException("Passwords do not match");
+                }
+
+                // Find token
+                PasswordResetToken resetToken = passwordResetTokenRepository
+                                .findByToken(request.getToken())
+                                .orElseThrow(() -> new BadRequestException("Invalid or expired reset token"));
+
+                // Check if token is expired
+                if (resetToken.isExpired()) {
+                        throw new BadRequestException("Reset token has expired");
+                }
+
+                // Check if token is already used
+                if (resetToken.isUsed()) {
+                        throw new BadRequestException("Reset token has already been used");
+                }
+
+                // Get profile
+                Profile profile = resetToken.getProfile();
+
+                // Update password
+                profile.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                profileRepository.save(profile);
+
+                // Mark token as used
+                resetToken.setUsed(true);
+                passwordResetTokenRepository.save(resetToken);
+
+                log.info("Password reset successfully for user: {}", profile.getEmail());
+        }
+
+        @Transactional
+        public AuthResponse googleLogin(com.expense.management.model.dto.request.GoogleLoginRequest request) {
+                try {
+                        // Verify Google token and get user info
+                        com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier verifier = new com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier.Builder(
+                                        new com.google.api.client.http.javanet.NetHttpTransport(),
+                                        new com.google.api.client.json.gson.GsonFactory())
+                                        .setAudience(java.util.Collections.singletonList(googleClientId))
+                                        .build();
+
+                        com.google.api.client.googleapis.auth.oauth2.GoogleIdToken idToken = verifier
+                                        .verify(request.getToken());
+
+                        if (idToken == null) {
+                                throw new BadRequestException("Invalid Google token");
+                        }
+
+                        com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload payload = idToken
+                                        .getPayload();
+                        String googleId = payload.getSubject();
+                        String email = payload.getEmail();
+                        String name = (String) payload.get("name");
+                        String pictureUrl = (String) payload.get("picture");
+                        Boolean emailVerified = payload.getEmailVerified();
+
+                        if (!emailVerified) {
+                                throw new BadRequestException("Email not verified by Google");
+                        }
+
+                        // Check if user exists by Google ID
+                        Profile profile = profileRepository.findByGoogleId(googleId).orElse(null);
+
+                        if (profile == null) {
+                                // Check if email already exists (registered with local auth)
+                                if (profileRepository.existsByEmail(email)) {
+                                        throw new BadRequestException(
+                                                        "Email already registered with password. Please login with your password.");
+                                }
+
+                                // Create new user with Google auth
+                                profile = Profile.builder()
+                                                .email(email)
+                                                .fullName(name)
+                                                .googleId(googleId)
+                                                .avatarUrl(pictureUrl)
+                                                .authProvider(com.expense.management.model.enums.AuthProvider.GOOGLE)
+                                                .role(com.expense.management.model.enums.Role.USER)
+                                                .build();
+
+                                profile = profileRepository.save(profile);
+                                log.info("New user registered via Google: {}", email);
+                        } else {
+                                // Update user info from Google
+                                profile.setFullName(name);
+                                profile.setAvatarUrl(pictureUrl);
+                                profile = profileRepository.save(profile);
+                                log.info("User logged in via Google: {}", email);
+                        }
+
+                        // Generate JWT token
+                        String token = jwtTokenProvider.generateToken(
+                                        profile.getId(),
+                                        profile.getEmail(),
+                                        profile.getRole().name());
+
+                        // Build response
+                        UserResponse userResponse = mapToUserResponse(profile);
+
+                        return AuthResponse.builder()
+                                        .token(token)
+                                        .user(userResponse)
+                                        .build();
+
+                } catch (Exception e) {
+                        log.error("Google login failed: {}", e.getMessage(), e);
+                        throw new BadRequestException("Google login failed: " + e.getMessage());
+                }
         }
 
         private UserResponse mapToUserResponse(Profile profile) {

@@ -1,5 +1,6 @@
 package com.expense.management.model.entity;
 
+import com.expense.management.model.enums.AuthProvider;
 import com.expense.management.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ public class Profile {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     @Column(name = "full_name")
@@ -47,6 +48,14 @@ public class Profile {
     @Column(nullable = false)
     @Builder.Default
     private Role role = Role.USER;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "auth_provider", nullable = false)
+    @Builder.Default
+    private AuthProvider authProvider = AuthProvider.LOCAL;
+
+    @Column(name = "google_id", unique = true)
+    private String googleId;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

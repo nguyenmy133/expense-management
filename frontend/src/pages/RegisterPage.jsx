@@ -18,6 +18,25 @@ export default function RegisterPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        // Email validation regex
+        const emailRegex = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
+
+        if (!emailRegex.test(email)) {
+            setError('Vui lòng nhập địa chỉ email hợp lệ (ví dụ: user@example.com)');
+            return;
+        }
+
+        if (password.length < 6) {
+            setError('Mật khẩu phải có ít nhất 6 ký tự');
+            return;
+        }
+
+        if (!fullName.trim()) {
+            setError('Vui lòng nhập họ tên');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -31,21 +50,43 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-950 dark:via-purple-950/20 dark:to-gray-950 px-4">
-            <div className="max-w-md w-full animate-scale-in">
+        <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+            {/* Animated Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-900 dark:via-purple-900 dark:to-pink-900"></div>
+
+            {/* Animated Overlay Pattern */}
+            <div className="absolute inset-0 opacity-30">
+                <div className="absolute top-20 right-10 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute top-1/3 left-20 w-96 h-96 bg-indigo-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.2s' }}></div>
+                <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-purple-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2.5s' }}></div>
+                <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-pink-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.8s' }}></div>
+            </div>
+
+            {/* Floating Financial Elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {/* Dollar sign inspired circles */}
+                <div className="absolute top-20 left-1/4 w-16 h-16 border-4 border-emerald-300/30 rounded-full animate-bounce" style={{ animationDuration: '3.2s' }}></div>
+                <div className="absolute top-1/2 right-1/4 w-12 h-12 border-4 border-teal-400/25 rounded-full animate-bounce" style={{ animationDuration: '4.2s', animationDelay: '0.8s' }}></div>
+                <div className="absolute bottom-1/4 left-1/2 w-18 h-18 border-4 border-cyan-300/30 rounded-full animate-bounce" style={{ animationDuration: '3.8s', animationDelay: '1.2s' }}></div>
+                <div className="absolute bottom-1/2 right-1/3 w-14 h-14 border-4 border-lime-300/20 rounded-full animate-bounce" style={{ animationDuration: '4.8s', animationDelay: '1.8s' }}></div>
+                <div className="absolute top-2/3 left-1/5 w-10 h-10 border-4 border-yellow-300/25 rounded-full animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '2.2s' }}></div>
+            </div>
+
+            {/* Content Container */}
+            <div className="max-w-md w-full animate-scale-in relative z-10">
                 {/* Logo/Title */}
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 gradient-primary rounded-2xl mb-4 shadow-xl animate-pulse">
                         <Wallet className="w-9 h-9 text-white" />
                     </div>
-                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h1 className="text-4xl font-bold text-white mb-2">
                         {t('auth.register.title')}
                     </h1>
-                    <p className="text-gray-600 dark:text-gray-400">{t('auth.register.subtitle')}</p>
+                    <p className="text-white/90">{t('auth.register.subtitle')}</p>
                 </div>
 
                 {/* Register Form */}
-                <div className="card-solid animate-slide-up">
+                <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20 dark:border-gray-700/50 animate-slide-up">
                     {error && (
                         <div className="mb-4 p-4 bg-danger-50 dark:bg-danger-900/20 border-l-4 border-danger-500 rounded-lg">
                             <div className="flex items-start gap-3">
@@ -150,7 +191,7 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Footer */}
-                <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
+                <p className="text-center text-sm text-white/80 mt-8">
                     {t('auth.footer')}
                 </p>
             </div>

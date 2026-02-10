@@ -100,7 +100,8 @@
             "create_title": "Thêm ngân sách",
             "edit_title": "Điều chỉnh ngân sách",
             "month": "Tháng",
-            "year": "Năm"
+            "year": "Năm",
+            "parent_only_hint": "Chỉ có thể tạo ngân sách cho danh mục cha"
         }
     },
     "reports": {
@@ -192,6 +193,47 @@
             "balance": "Số dư"
         },
         "loading": "Đang tải dữ liệu...",
+        "view_mode": {
+            "list": "Danh sách",
+            "calendar": "Lịch"
+        },
+        "transactions": {
+            "recent": "Giao dịch gần đây",
+            "calendar_title": "Lịch giao dịch",
+            "empty": "Chưa có giao dịch nào",
+            "view_all": "Xem tất cả",
+            "today": "Hôm nay",
+            "yesterday": "Hôm qua"
+        },
+        "fab": {
+            "income": "Thu nhập",
+            "expense": "Chi tiêu",
+            "budget": "Ngân sách"
+        },
+        "calendar": {
+            "days": [
+                "CN",
+                "T2",
+                "T3",
+                "T4",
+                "T5",
+                "T6",
+                "T7"
+            ],
+            "detail_title": "Chi tiết ngày {{day}}/{{month}}",
+            "transaction_count": "{{count}} giao dịch",
+            "no_note": "Không có ghi chú"
+        },
+        "budget": {
+            "title": "Ngân sách tháng này",
+            "empty": "Chưa có ngân sách nào",
+            "create": "Tạo ngân sách",
+            "view_details": "Chi tiết",
+            "over_budget": "Vượt",
+            "over_message": "Bạn đã chi vượt {{amount}}đ",
+            "adjust": "Điều chỉnh",
+            "view_transactions": "Xem giao dịch"
+        },
         "tip": {
             "title": "Mẹo quản lý chi tiêu",
             "content": "Hãy ghi chép mọi khoản chi tiêu hàng ngày để kiểm soát tài chính tốt hơn!"
@@ -236,7 +278,9 @@
                 "delete_success": "Xóa danh mục thành công!",
                 "error_save": "Lỗi khi lưu danh mục",
                 "error_delete": "Lỗi khi xóa danh mục",
-                "confirm_delete": "Bạn có chắc chắn muốn xóa danh mục này?"
+                "confirm_delete": "Bạn có chắc chắn muốn xóa danh mục này?",
+                "duplicate_parent": "Tên danh mục cha này đã tồn tại trong cùng loại!",
+                "duplicate_child": "Tên danh mục con này đã tồn tại trong cùng danh mục cha!"
             }
         },
         "users": {

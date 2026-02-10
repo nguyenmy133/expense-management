@@ -721,7 +721,7 @@ export default function TransactionsPage() {
                                             type="time"
                                             value={formData.time}
                                             onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                                            className="input-field w-32"
+                                            className="input-field w-36"
                                             required
                                         />
                                     </div>

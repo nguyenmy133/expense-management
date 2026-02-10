@@ -277,10 +277,14 @@ export default function BudgetsPage() {
                                     disabled={modalMode === 'edit'} // Usually we don't change category in edit, or allow it
                                 >
                                     <option value="">{t('transactions.modal.select_category')}</option>
-                                    {categories.map(cat => (
+                                    {/* Only show parent categories (parentId = null) */}
+                                    {categories.filter(cat => cat.parentId === null).map(cat => (
                                         <option key={cat.id} value={cat.id}>{cat.icon} {cat.name}</option>
                                     ))}
                                 </select>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
+                                    {t('budgets.modal.parent_only_hint')}
+                                </p>
                             </div>
 
                             <div>

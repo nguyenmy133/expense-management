@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, AlertTriangle, Edit, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function BudgetProgress({ budgets, transactions }) {
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
 
     // Calculate progress for each budget
@@ -38,18 +40,18 @@ export default function BudgetProgress({ budgets, transactions }) {
             <div className="card-solid animate-slide-up">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        Ngân sách tháng này
+                        {t('dashboard.budget.title')}
                     </h3>
                 </div>
                 <div className="text-center py-8">
                     <p className="text-gray-500 dark:text-gray-400 mb-3">
-                        Chưa có ngân sách nào
+                        {t('dashboard.budget.empty')}
                     </p>
                     <button
                         onClick={() => navigate('/budgets')}
                         className="btn-primary px-4 py-2 text-sm"
                     >
-                        Tạo ngân sách
+                        {t('dashboard.budget.create')}
                     </button>
                 </div>
             </div>
@@ -57,7 +59,8 @@ export default function BudgetProgress({ budgets, transactions }) {
     }
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('vi-VN').format(Math.abs(amount));
+        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+        return new Intl.NumberFormat(locale).format(Math.abs(amount));
     };
 
     const getProgressColor = (status) => {
@@ -89,13 +92,13 @@ export default function BudgetProgress({ budgets, transactions }) {
         <div className="card-solid animate-slide-up">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Ngân sách tháng này
+                    {t('dashboard.budget.title')}
                 </h3>
                 <button
                     onClick={() => navigate('/budgets')}
                     className="text-sm text-primary hover:text-primary-700 dark:hover:text-primary-400 font-medium flex items-center gap-1 transition-colors"
                 >
-                    Chi tiết
+                    {t('dashboard.budget.view_details')}
                     <ArrowRight className="w-4 h-4" />
                 </button>
             </div>
@@ -115,11 +118,11 @@ export default function BudgetProgress({ budgets, transactions }) {
                                             <div className="relative group/tooltip">
                                                 <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 uppercase tracking-wider cursor-help">
                                                     <AlertTriangle className="w-3 h-3" />
-                                                    Vượt
+                                                    {t('dashboard.budget.over_budget')}
                                                 </span>
                                                 {/* Tooltip */}
                                                 <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/tooltip:block w-max px-2 py-1 bg-gray-800 text-white text-xs rounded shadow z-10">
-                                                    Bạn đã chi vượt {formatCurrency(Math.abs(budget.remaining))}đ
+                                                    {t('dashboard.budget.over_message', { amount: formatCurrency(Math.abs(budget.remaining)) })}
                                                     <div className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-gray-800 rotate-45 -mt-1"></div>
                                                 </div>
                                             </div>
@@ -157,14 +160,14 @@ export default function BudgetProgress({ budgets, transactions }) {
                                     className="text-xs flex items-center gap-1.5 px-2 py-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 transition-colors font-medium"
                                 >
                                     <Edit className="w-3 h-3" />
-                                    Điều chỉnh
+                                    {t('dashboard.budget.adjust')}
                                 </button>
                                 <button
                                     onClick={() => navigate('/transactions', { state: { categoryId: budget.categoryId } })}
                                     className="text-xs flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 transition-colors font-medium border border-gray-100 dark:border-gray-700"
                                 >
                                     <ExternalLink className="w-3 h-3" />
-                                    Xem giao dịch
+                                    {t('dashboard.budget.view_transactions')}
                                 </button>
                             </div>
                         )}

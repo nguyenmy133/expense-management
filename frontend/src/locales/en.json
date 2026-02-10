@@ -100,7 +100,8 @@
             "create_title": "Add Budget",
             "edit_title": "Edit Budget",
             "month": "Month",
-            "year": "Year"
+            "year": "Year",
+            "parent_only_hint": "Budgets can only be created for parent categories"
         }
     },
     "reports": {
@@ -192,6 +193,47 @@
             "balance": "Balance"
         },
         "loading": "Loading data...",
+        "view_mode": {
+            "list": "List",
+            "calendar": "Calendar"
+        },
+        "transactions": {
+            "recent": "Recent Transactions",
+            "calendar_title": "Transaction Calendar",
+            "empty": "No transactions yet",
+            "view_all": "View All",
+            "today": "Today",
+            "yesterday": "Yesterday"
+        },
+        "fab": {
+            "income": "Income",
+            "expense": "Expense",
+            "budget": "Budget"
+        },
+        "calendar": {
+            "days": [
+                "Sun",
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat"
+            ],
+            "detail_title": "Details for {{day}}/{{month}}",
+            "transaction_count": "{{count}} transactions",
+            "no_note": "No note"
+        },
+        "budget": {
+            "title": "This Month's Budget",
+            "empty": "No budgets yet",
+            "create": "Create Budget",
+            "view_details": "Details",
+            "over_budget": "Over",
+            "over_message": "You've overspent by {{amount}}đ",
+            "adjust": "Adjust",
+            "view_transactions": "View Transactions"
+        },
         "tip": {
             "title": "Expense Management Tip",
             "content": "Track every daily expense to better control your finances!"
@@ -236,7 +278,9 @@
                 "delete_success": "Category deleted successfully!",
                 "error_save": "Error saving category",
                 "error_delete": "Error deleting category",
-                "confirm_delete": "Are you sure you want to delete this category?"
+                "confirm_delete": "Are you sure you want to delete this category?",
+                "duplicate_parent": "This parent category name already exists in the same type!",
+                "duplicate_child": "This child category name already exists under the same parent!"
             }
         },
         "users": {

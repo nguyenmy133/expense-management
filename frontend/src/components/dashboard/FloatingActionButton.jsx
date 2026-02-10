@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Plus, X, TrendingUp, TrendingDown, Target } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function FloatingActionButton() {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -11,7 +13,7 @@ export default function FloatingActionButton() {
 
     const actions = [
         {
-            label: 'Thu nhập',
+            label: t('dashboard.fab.income'),
             icon: TrendingUp,
             color: 'bg-success-500 hover:bg-success-600',
             action: () => {
@@ -20,7 +22,7 @@ export default function FloatingActionButton() {
             }
         },
         {
-            label: 'Chi tiêu',
+            label: t('dashboard.fab.expense'),
             icon: TrendingDown,
             color: 'bg-danger-500 hover:bg-danger-600',
             action: () => {
@@ -29,7 +31,7 @@ export default function FloatingActionButton() {
             }
         },
         {
-            label: 'Ngân sách',
+            label: t('dashboard.fab.budget'),
             icon: Target,
             color: 'bg-primary-500 hover:bg-primary-600',
             action: () => {

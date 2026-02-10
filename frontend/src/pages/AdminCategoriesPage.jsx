@@ -102,13 +102,64 @@ export default function AdminCategoriesPage() {
     const handleSave = async () => {
         try {
             setSaving(true);
+
+            // Normalize name for comparison (trim and lowercase)
+            const normalizedName = formData.name.trim().toLowerCase();
+
             // Ensure parentId is strictly null if empty string or 0
             const finalParentId = formData.parentId && formData.parentId !== ''
                 ? parseInt(formData.parentId)
                 : null;
 
+            // Check for duplicate names based on context
+            const isDuplicate = categories.some(cat => {
+                // Skip the current category when editing
+                if (editingCategory && cat.id === editingCategory.id) {
+                    return false;
+                }
+
+                // Normalize existing category name
+                const existingName = cat.name.trim().toLowerCase();
+
+                // Names must match
+                if (existingName !== normalizedName) {
+                    return false;
+                }
+
+                // Must be same type
+                if (cat.type !== formData.type) {
+                    return false;
+                }
+
+                // Context-aware duplicate checking:
+                // 1. If creating/editing a parent category (no parentId)
+                //    -> Check against other parent categories
+                if (finalParentId === null) {
+                    return cat.parentId === null;
+                }
+
+                // 2. If creating/editing a child category
+                //    -> Check only among siblings (same parentId)
+                return cat.parentId === finalParentId;
+            });
+
+            if (isDuplicate) {
+                const contextMessage = finalParentId === null
+                    ? t('admin.categories.messages.duplicate_parent', {
+                        defaultValue: 'Tên danh mục cha này đã tồn tại trong cùng loại!'
+                    })
+                    : t('admin.categories.messages.duplicate_child', {
+                        defaultValue: 'Tên danh mục con này đã tồn tại trong cùng danh mục cha!'
+                    });
+
+                alert(contextMessage);
+                setSaving(false);
+                return;
+            }
+
             const payload = {
                 ...formData,
+                name: formData.name.trim(), // Trim whitespace before saving
                 parentId: finalParentId
             };
 

@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, X } from 'lucide-r
 import { useTranslation } from 'react-i18next';
 
 export default function CalendarView({ transactions = [] }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
 
@@ -88,10 +88,10 @@ export default function CalendarView({ transactions = [] }) {
                     `}
                 >
                     <span className={`text-sm font-semibold ${new Date().getDate() === day &&
-                            new Date().getMonth() === currentDate.getMonth() &&
-                            new Date().getFullYear() === currentDate.getFullYear()
-                            ? 'bg-primary text-white w-6 h-6 rounded-full flex items-center justify-center'
-                            : 'text-gray-700 dark:text-gray-300'
+                        new Date().getMonth() === currentDate.getMonth() &&
+                        new Date().getFullYear() === currentDate.getFullYear()
+                        ? 'bg-primary text-white w-6 h-6 rounded-full flex items-center justify-center'
+                        : 'text-gray-700 dark:text-gray-300'
                         }`}>
                         {day}
                     </span>
@@ -100,12 +100,12 @@ export default function CalendarView({ transactions = [] }) {
                         <div className="flex flex-col gap-0.5 mt-auto mb-2 w-full px-1">
                             {stat.income > 0 && (
                                 <div className="text-[10px] font-bold text-success-600 bg-success-50 dark:bg-success-900/30 dark:text-success-400 rounded px-1 truncate text-center">
-                                    +{stat.income.toLocaleString('vi-VN')}
+                                    +{stat.income.toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US')}
                                 </div>
                             )}
                             {stat.expense > 0 && (
                                 <div className="text-[10px] font-bold text-danger-600 bg-danger-50 dark:bg-danger-900/30 dark:text-danger-400 rounded px-1 truncate text-center">
-                                    -{stat.expense.toLocaleString('vi-VN')}
+                                    -{stat.expense.toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US')}
                                 </div>
                             )}
                         </div>
@@ -124,7 +124,7 @@ export default function CalendarView({ transactions = [] }) {
                     <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </button>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white capitalize">
-                    {currentDate.toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' })}
+                    {currentDate.toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-US', { month: 'long', year: 'numeric' })}
                 </h3>
                 <button onClick={nextMonth} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
                     <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -133,7 +133,7 @@ export default function CalendarView({ transactions = [] }) {
 
             {/* Days Header */}
             <div className="grid grid-cols-7 mb-2">
-                {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((d, i) => (
+                {t('dashboard.calendar.days', { returnObjects: true }).map((d, i) => (
                     <div key={i} className="text-center text-xs font-semibold text-gray-500 uppercase py-2">
                         {d}
                     </div>
@@ -150,9 +150,9 @@ export default function CalendarView({ transactions = [] }) {
                 <div className="mt-4 animate-slide-up">
                     <div className="flex items-center justify-between mb-3">
                         <h4 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            <span>Chi tiết ngày {selectedDate}/{currentDate.getMonth() + 1}</span>
+                            <span>{t('dashboard.calendar.detail_title', { day: selectedDate, month: currentDate.getMonth() + 1 })}</span>
                             <span className="text-xs font-normal text-gray-500">
-                                ({dailyStats[selectedDate].transactions.length} giao dịch)
+                                ({t('dashboard.calendar.transaction_count', { count: dailyStats[selectedDate].transactions.length })})
                             </span>
                         </h4>
                         <button onClick={() => setSelectedDate(null)} className="text-gray-400 hover:text-gray-600">
@@ -170,11 +170,11 @@ export default function CalendarView({ transactions = [] }) {
                                     </div>
                                     <div>
                                         <p className="font-medium text-gray-900 dark:text-white text-sm">{tx.categoryName}</p>
-                                        <p className="text-xs text-gray-500 line-clamp-1">{tx.note || 'Không có ghi chú'}</p>
+                                        <p className="text-xs text-gray-500 line-clamp-1">{tx.note || t('dashboard.calendar.no_note')}</p>
                                     </div>
                                 </div>
                                 <span className={`font-bold text-sm ${tx.type === 'INCOME' ? 'text-success-600' : 'text-danger-600'}`}>
-                                    {tx.type === 'INCOME' ? '+' : '-'}{tx.amount.toLocaleString('vi-VN')}
+                                    {tx.type === 'INCOME' ? '+' : '-'}{tx.amount.toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US')}
                                 </span>
                             </div>
                         ))}

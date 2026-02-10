@@ -27,7 +27,7 @@ import FloatingActionButton from '../components/dashboard/FloatingActionButton';
 
 export default function DashboardPage() {
     const { user, signOut } = useAuth();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [trendData, setTrendData] = useState(null);
@@ -72,7 +72,9 @@ export default function DashboardPage() {
         }
     };
 
-    const currentMonth = new Date().toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' });
+    // Get current locale from i18n (vi -> vi-VN, en -> en-US)
+    const currentLocale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+    const currentMonth = new Date().toLocaleDateString(currentLocale, { month: 'long', year: 'numeric' });
 
     return (
         <div className="p-4 sm:p-6 lg:p-8">
@@ -153,7 +155,7 @@ export default function DashboardPage() {
                     <div className="mb-8">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                                {viewMode === 'list' ? 'Giao dịch gần đây' : 'Lịch giao dịch'}
+                                {viewMode === 'list' ? t('dashboard.transactions.recent') : t('dashboard.transactions.calendar_title')}
                             </h3>
 
                             {/* Toggle Switch */}
@@ -166,7 +168,7 @@ export default function DashboardPage() {
                                         }`}
                                 >
                                     <List className="w-4 h-4" />
-                                    Danh sách
+                                    {t('dashboard.view_mode.list')}
                                 </button>
                                 <button
                                     onClick={() => setViewMode('calendar')}
@@ -176,7 +178,7 @@ export default function DashboardPage() {
                                         }`}
                                 >
                                     <Calendar className="w-4 h-4" />
-                                    Lịch
+                                    {t('dashboard.view_mode.calendar')}
                                 </button>
                             </div>
                         </div>
